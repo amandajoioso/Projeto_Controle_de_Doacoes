@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+ <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+   integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+ <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+   integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
+ </script>
+ <title>Atualizar Produto</title>
+ <style>
+   .loader-container {
+     display: flex;
+     justify-content: center;
+     align-items: center;
+   }
+ </style>
+</head>
+
+<body>
+ <div id="app-menu">
+    <div class="mb-3">
+      <label for="item-code" class="form-label">Código de barras</label>
+      <input type="number" class="form-control" id="item-code" placeholder="7898922460056" v-model="itemCodeRegister"
+      min="10000000" pattern="\d{8,}" title="O código de barras deve conter pelo menos 8 dígitos" pattern="\d*" required> 
+    </div>
+
+    <div class="mb-3">
+      <label for="item-name" class="form-label">Nome do item</label>
+      <input type="text" class="form-control" id="item-name" placeholder="Arroz" v-model="itemNameRegister" required>
+    </div>
+
+    <div class="mb-3">
+      <label for="item-brand" class="form-label">Marca do item</label>
+      <input type="text" class="form-control" id="item-brand" placeholder="Camil" v-model="itemBrandRegister" required>
+    </div>
+
+    <div class="mb-3">
+      <label for="item-weight" class="form-label">Peso do item (gramas)</label>
+      <input type="number" class="form-control" id="item-weight" placeholder="500" v-model="itemWeightRegister"
+      min="1" title="O peso do produto deve ser um número inteiro maior que zero" pattern="\d*" required>
+    </div>
+
+     <!-- Dropdown de categoria -->
+     <div class="btn-group w-100 mb-3">
+       <button class="btn btn-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown"
+         aria-expanded="false">
+         Categoria
+       </button>
+       <ul class="dropdown-menu w-100">
+         <li v-for="item in items" :key="item.id">
+           <a class="dropdown-item" href="#" @click.prevent="selectCategory(item.title)">{{ item.title }}</a>
+         </li>
+       </ul>
+     </div>
+
+     <!-- Loader ou botão de cadastro -->
+     <div class="loader-container mb-3">
+       <!-- Exibe o botão enquanto o loading é falso -->
+       <button type="button" class="btn btn-success w-100" @click="registerProduct" v-if="!loading">
+         Atualizar produto
+       </button>
+
+       <!-- Exibe o loader enquanto loading é true -->
+       <div class="spinner-border text-success" role="status" v-show="loading">
+         <span class="visually-hidden">Loading...</span>
+       </div>
+     </div>
+   </div>
+ </div>
+
+ <script>
+   const { createApp } = Vue;
+
+   createApp({
+     data() {
+       return {
+         loading: false, // Estado do loader
+         itemCode: '',
+         itemName: '',
+         itemBrand: '',
+         itemWeight: '',
+         selectedCategory: null,
+         items: [
+           { id: 1, title: "Alimento" },
+           { id: 2, title: "Higiene/Limpeza" }
+         ]
+       };
+     },
+     methods: {
+       onSuccess() {
+         setTimeout(() => {
+           this.loading = false; // Desativa o loader após a operação
+         }, 100);
+       },
+       selectCategory(category) {
+         this.selectedCategory = category; // Armazena a categoria selecionada
+       },
+       async registerProduct() {
+         // Ativa o loader
+         this.loading = true;
+
+         // Executa o processo de registro
+         await google.script.run.withSuccessHandler(this.onSuccess).registerProduct(
+           this.itemCode, this.itemName, this.itemBrand, this.selectedCategory, this.itemWeight
+         );
+
+         // Limpa os campos após o cadastro, se necessário
+         this.itemCode = '';
+         this.itemName = '';
+         this.itemBrand = '';
+         this.itemWeight = '';
+       }
+     }
+   }).mount('#app-menu');
+ </script>
+</body>
+
+</html>
