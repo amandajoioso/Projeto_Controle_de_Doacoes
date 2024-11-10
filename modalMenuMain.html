@@ -297,6 +297,50 @@
       </div>
     </div>
 
+    <!-- Modal Excluir Produto -->
+    <div class="modal fade" id="staticBackdrop3" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+        aria-labelledby="excludeProductLabel" aria-hidden="true">
+      <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="excludeProductLabel">Excluir Produto</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="container">
+              <!-- Input para buscar o código de barras -->
+              <div class="mb-3">
+                <label for="search-code" class="form-label">Código de barras do produto</label>
+                <input type="text" class="form-control" id="search-code" placeholder="7898922460056"
+                      v-model="itemCodeSearch" inputmode="numeric" pattern="\d*" required>
+
+                <!-- Exibe o botão enquanto o loading é falso -->
+                <button class="btn btn-primary mt-2" @click="deleteProduct" v-if="!loading">Excluir Produto</button>
+
+                <!-- Exibe o loader enquanto loading é true -->
+                <div class="mt-2">
+                  <div class="spinner-border text-succes" role="status" v-show="loading">
+                    <span class="visually-hidden">Loading...</span>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+          </div>
+
+          <!-- Mensagem de sucesso -->
+          <div v-if="successMessage" class="alert alert-success mt-3">{{ successMessage }}</div>
+
+          <!-- Mensagem de erro -->
+          <div v-if="errorMessage" class="alert alert-danger mt-3">{{ errorMessage }}</div>
+        </div>
+      </div>
+    </div>
+
 
     <!-- Card -->
     <div class="container" v-show="!loading">
@@ -333,7 +377,7 @@ createApp({
         { "title": "Cadastrar", "description": "Cadastre um novo produto", "button": "Cadastrar", "callback": this.modalRegister, "modalID": "#staticBackdrop1"},
         { "title": "Atualizar", "description": "Atualize os dados de um produto já cadastrado", "button": "Atualizar", "callback": this.modalAtualizar, "modalID": "#staticBackdrop2"},
         { "title": "Consultar", "description": "Consulte todos os dados de um produto", "button": "Consultar", "modalID": "#staticBackdrop0"},
-        { "title": "Excluir", "description": "Exclua os dados de um produto", "button": "Excluir", "modalID": "#staticBackdrop0" }
+        { "title": "Excluir", "description": "Exclua os dados de um produto", "button": "Excluir", "modalID": "#staticBackdrop3" }
       ],
       
       // Register data
@@ -479,6 +523,30 @@ createApp({
         this.selectedCategoryUpdate,
         this.itemWeightUpdate
       );
+    },
+
+    async deleteProduct() {
+      this.loading = true;
+      this.errorMessage = "";
+
+      google.script.run.withSuccessHandler(this.handleDeleteProduct).fetchProductByCode(this.itemCodeSearch);
+    },
+
+    handleDeleteProduct(data) {
+      if (data) {
+        google.script.run.withSuccessHandler(() => {
+          this.loading = false;
+          this.successMessage = "Produto deletado com sucesso!";
+          setTimeout(() => { this.successMessage = ''; }, 4000); // Limpa a mensagem após 4 segundos
+        }).excludeProductInDatabase(
+          data.row
+        );
+
+      } else {
+          this.loading = false;
+          this.errorMessage = "Produto não encontrado.";
+          setTimeout(() => { this.errorMessage = ''; }, 4000); // Limpa a mensagem após 4 segundos
+      }
     }
   }
 }).mount('#app-menu');
