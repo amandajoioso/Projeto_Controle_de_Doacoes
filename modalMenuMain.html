@@ -324,6 +324,12 @@
                   </div>
                 </div>
 
+                <!-- Mensagem de sucesso -->
+                <div v-if="successMessage" class="alert alert-success mt-3">{{ successMessage }}</div>
+      
+                <!-- Mensagem de erro -->
+                <div v-if="errorMessage" class="alert alert-danger mt-3">{{ errorMessage }}</div>
+
               </div>
             </div>
           </div>
@@ -332,11 +338,6 @@
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
           </div>
 
-          <!-- Mensagem de sucesso -->
-          <div v-if="successMessage" class="alert alert-success mt-3">{{ successMessage }}</div>
-
-          <!-- Mensagem de erro -->
-          <div v-if="errorMessage" class="alert alert-danger mt-3">{{ errorMessage }}</div>
         </div>
       </div>
     </div>
@@ -551,7 +552,5 @@ createApp({
   }
 }).mount('#app-menu');
 </script>
-
-
-
 </html>
+
