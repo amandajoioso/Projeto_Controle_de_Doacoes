@@ -19,7 +19,7 @@ function showModalRegister() {
   SpreadsheetApp.getUi().showModalDialog(html, `${SERVICENAME}: Cadastro`)
 }
 
-function showModalAtualisar() {
+function showModalAtualizar() {
   let html = HtmlService.createHtmlOutputFromFile('modalAtualizar')
     .setWidth(900)
     .setHeight(600)

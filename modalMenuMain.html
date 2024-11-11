@@ -41,100 +41,12 @@
       display: flex;
       justify-content: center;
       align-items: center;
-    }
-
-    /* Loader */
-    #loader {
-      animation: rotate 2s infinite;
-      height: 50px;
-      width: 50px;
-    }
-
-    #loader:before,
-    #loader:after {
-      border-radius: 50%;
-      content: '';
-      display: block;
-      height: 20px;
-      width: 20px;
-    }
-
-    #loader:before {
-      animation: ball1 2s infinite;
-      background-color: #11A7B6;
-      box-shadow: 30px 0 0 #11A7B6;
-      margin-bottom: 10px;
-    }
-
-    #loader:after {
-      animation: ball2 2s infinite;
-      background-color: #11A7B6;
-      box-shadow: 30px 0 0 #11A7B6;
-    }
-
-    @keyframes rotate {
-      0% {
-        -webkit-transform: rotate(0deg) scale(0.8);
-        -moz-transform: rotate(0deg) scale(0.8);
-      }
-
-      50% {
-        -webkit-transform: rotate(360deg) scale(1.2);
-        -moz-transform: rotate(360deg) scale(1.2);
-      }
-
-      100% {
-        -webkit-transform: rotate(720deg) scale(0.8);
-        -moz-transform: rotate(720deg) scale(0.8);
-      }
-    }
-
-    @keyframes ball1 {
-      0% {
-        box-shadow: 30px 0 0 #11A7B6;
-      }
-
-      50% {
-        box-shadow: 0 0 0 #11A7B6;
-        margin-bottom: 0;
-        -webkit-transform: translate(15px, 15px);
-        -moz-transform: translate(15px, 15px);
-      }
-
-      100% {
-        box-shadow: 30px 0 0 #11A7B6;
-        margin-bottom: 10px;
-      }
-    }
-
-    @keyframes ball2 {
-      0% {
-        box-shadow: 30px 0 0 #11A7B6;
-      }
-
-      50% {
-        box-shadow: 0 0 0 #11A7B6;
-        margin-top: -20px;
-        -webkit-transform: translate(15px, 15px);
-        -moz-transform: translate(15px, 15px);
-      }
-
-      100% {
-        box-shadow: 30px 0 0 #11A7B6;
-        margin-top: 0;
-      }
-    }
+    }  
   </style>
 </head>
 
 <body>
   <div id="app-menu" class="d-flex flex-column justify-content-center align-items-center min-vh-100">
-
-    <!-- Loader -->
-    <div class="d-flex justify-content-center" v-show="loading">
-      <div id="loader" v-show="loading"></div>
-    </div>
-    <!-- Loader -->
 
     <!-- Modal Cadastrar -->
     <div class="modal fade" id="staticBackdrop1" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
@@ -212,21 +124,65 @@
     </div>
     <!-- Modal Cadastrar -->
 
-    <!-- Modal Em construção -->
+    <!-- Modal Consultar Produto -->
     <div class="modal fade" id="staticBackdrop0" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
       aria-labelledby="staticBackdropLabel" aria-hidden="true">
       <div class="modal-dialog modal-xl modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header">
-            <h1 class="modal-title fs-5" id="staticBackdropLabel">Em construção</h1>
+            <h1 class="modal-title fs-5" id="updateProductLabel">Consultar Produto</h1>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            <p>Em construção.</p>
+            <div class="container">
+              <!-- Input para buscar o código de barras -->
+              <div class="mb-3">
+                <label for="search-code" class="form-label">Código de barras do produto</label>
+                <input type="text" class="form-control" id="search-code" placeholder="7898922460056"
+                      v-model="itemCodeSearch" inputmode="numeric" pattern="\d*" required>
+                <button class="btn btn-primary mt-2" @click="fetchProductData">Buscar Produto</button>
+              </div>
+
+              <!-- Exibe os campos de atualização se o produto for encontrado -->
+              <div v-if="productFound">
+                <div class="mb-3">
+                  <label for="update-item-name" class="form-label">Nome do item</label>
+                  <input type="text" class="form-control" id="update-item-name" v-model="itemNameUpdate" required disabled>
+                </div>
+
+                <div class="mb-3">
+                  <label for="update-item-brand" class="form-label">Marca do item</label>
+                  <input type="text" class="form-control" id="update-item-brand" v-model="itemBrandUpdate" required disabled>
+                </div>
+
+                <div class="mb-3">
+                  <label for="update-item-weight" class="form-label">Peso do item (gramas)</label>
+                  <input type="text" class="form-control" id="update-item-weight" v-model="itemWeightUpdate" inputmode="numeric" pattern="\d*" required disabled>
+                </div>
+
+                <div class="input-group mb-3">
+                  <label class="input-group-text" for="update-category">Categoria do produto</label>
+                  <select class="form-select" id="update-category" v-model="selectedCategoryUpdate" disabled>
+                    <option disabled value="">Escolha...</option>
+                    <option :value="item.title" v-for="item in itemsRegister" :key="item.id">{{ item.title }}</option>
+                  </select>
+                </div>
+                
+              </div>
+
+              <!-- Mensagem de sucesso -->
+              <div v-if="successMessage" class="alert alert-success mt-3">{{ successMessage }}</div>
+              
+              <!-- Mensagem de erro caso o produto não seja encontrado -->
+              <div v-else-if="errorMessage" class="alert alert-danger mt-3">{{ errorMessage }}</div>
+
+              
+
+            </div>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
-          </div>          
+          </div>
         </div>
       </div>
     </div>
@@ -446,7 +402,7 @@ createApp({
         setTimeout(() => { this.errorMessage = ''; }, 4000); // Limpa a mensagem após 4 segundos
         return;
       }
-      
+
       this.errorMessage = '';
 
       google.script.run.withSuccessHandler((barcodeExists) => {
@@ -483,7 +439,7 @@ createApp({
     },
 
     async fetchProductData() {
-      this.loading = true;
+      // this.loading = true;
       this.errorMessage = "";
 
       google.script.run.withSuccessHandler(this.handleProductData).fetchProductByCode(this.itemCodeSearch);
@@ -560,5 +516,7 @@ createApp({
   }
 }).mount('#app-menu');
 </script>
-</html>
 
+
+
+</html>
