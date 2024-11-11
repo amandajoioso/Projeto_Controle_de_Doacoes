@@ -439,6 +439,14 @@ createApp({
         return;
       }
 
+      if (
+        this.itemCodeRegister < 10000000       
+      ) {
+        this.errorMessage = "O código de barras deve ter pelo menos oito dígitos.";
+        setTimeout(() => { this.errorMessage = ''; }, 4000); // Limpa a mensagem após 4 segundos
+        return;
+      }
+      
       this.errorMessage = '';
 
       google.script.run.withSuccessHandler((barcodeExists) => {
