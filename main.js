@@ -1,7 +1,7 @@
 /**
   * Nome do serviço
   */
-const SERVICENAME = 'Catálogo de Produtos'
+const SERVICENAME = 'Iniciar'
 
 function onOpen(e) {
   /**
@@ -9,6 +9,7 @@ function onOpen(e) {
     */
   let ui = SpreadsheetApp.getUi()
   ui.createMenu(SERVICENAME)
-    .addItem("Menu de opções", "showMenu")
+    .addItem("Catálogo de Produtos", "showMenu")
+    .addItem("Planilha de Registro", "showMenuRegistro") //a ser criado
     .addToUi()
 }

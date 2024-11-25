@@ -48,13 +48,13 @@
 <body>
   <div id="app-menu" class="d-flex flex-column justify-content-center align-items-center min-vh-100">
 
-    <!-- Modal Cadastrar -->
+    <!-- Modal Registrar -->
     <div class="modal fade" id="staticBackdrop1" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
       aria-labelledby="staticBackdropLabel" aria-hidden="true">
       <div class="modal-dialog modal-xl modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header">
-            <h1 class="modal-title fs-5" id="staticBackdropLabel">Cadastrar</h1>
+            <h1 class="modal-title fs-5" id="staticBackdropLabel">Registrar</h1>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
@@ -65,30 +65,11 @@
                 <input type="number" class="form-control" id="item-code" placeholder="7898922460056" v-model="itemCodeRegister"
                 min="10000000" pattern="\d{8,}" title="O código de barras deve conter pelo menos 8 dígitos" pattern="\d*" required> 
               </div>
-
+            
               <div class="mb-3">
-                <label for="item-name" class="form-label">Nome do item</label>
-                <input type="text" class="form-control" id="item-name" placeholder="Arroz" v-model="itemNameRegister" required>
-              </div>
-
-              <div class="mb-3">
-                <label for="item-brand" class="form-label">Marca do item</label>
-                <input type="text" class="form-control" id="item-brand" placeholder="Camil" v-model="itemBrandRegister" required>
-              </div>
-
-              <div class="mb-3">
-                <label for="item-weight" class="form-label">Peso do item (gramas)</label>
+                <label for="item-weight" class="form-label">Quantidade</label>
                 <input type="number" class="form-control" id="item-weight" placeholder="500" v-model="itemWeightRegister"
-                min="1" title="O peso do produto deve ser um número inteiro maior que zero" pattern="\d*" required>
-              </div>
-
-              <!-- Dropdown de categoria -->
-              <div class="input-group mb-3">
-                <label class="input-group-text" for="inputGroupSelect01">Categoria do produto</label>
-                <select class="form-select" id="inputGroupSelect01" v-model="selectedCategoryRegister">
-                  <option disabled value="">Escolha...</option>
-                  <option :value="item.title" v-for="item in itemsRegister" :key="item.id">{{ item.title }}</option>
-                </select>
+                min="1" title="A quantidade do produto deve ser um número inteiro maior que zero" pattern="\d*" required>
               </div>
 
               <!-- Mensagem de sucesso -->
@@ -102,7 +83,7 @@
               <div class="loader-container mb-3">
                 <!-- Exibe o botão enquanto o loading é falso -->
                 <button type="button" class="btn btn-success w-100" @click="registerProduct" v-if="!loadingRegister">
-                  Cadastrar produto
+                  Registrar produto
                 </button>
 
                 <!-- Exibe o loader enquanto loading é true -->
@@ -122,7 +103,7 @@
         </div>
       </div>
     </div>
-    <!-- Modal Cadastrar -->
+    <!-- Modal Registrar -->
 
     <!-- Modal Consultar Produto -->
     <div class="modal fade" id="staticBackdrop0" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
@@ -331,8 +312,8 @@ createApp({
       // Main data
       loading: false,
       items: [
-        { "title": "Cadastrar", "description": "Cadastre um novo produto", "button": "Cadastrar", "callback": this.modalRegister, "modalID": "#staticBackdrop1"},
-        { "title": "Atualizar", "description": "Atualize os dados de um produto já cadastrado", "button": "Atualizar", "callback": this.modalAtualizar, "modalID": "#staticBackdrop2"},
+        { "title": "Registrar", "description": "Registre um novo produto", "button": "Registrar", "callback": this.modalRegister, "modalID": "#staticBackdrop1"},
+        { "title": "Atualizar", "description": "Atualize os dados de um produto já registrado", "button": "Atualizar", "callback": this.modalAtualizar, "modalID": "#staticBackdrop2"},
         { "title": "Consultar", "description": "Consulte todos os dados de um produto", "button": "Consultar", "modalID": "#staticBackdrop0"},
         { "title": "Excluir", "description": "Exclua os dados de um produto", "button": "Excluir", "modalID": "#staticBackdrop3" }
       ],
@@ -390,7 +371,7 @@ createApp({
         !this.itemWeightRegister ||
         !this.selectedCategoryRegister
       ) {
-        this.errorMessage = "Por favor, preencha todos os campos antes de cadastrar o produto.";
+        this.errorMessage = "Por favor, preencha todos os campos antes de registrar o produto.";
         setTimeout(() => { this.errorMessage = ''; }, 4000); // Limpa a mensagem após 4 segundos
         return;
       }
@@ -421,7 +402,7 @@ createApp({
 
       await google.script.run.withSuccessHandler(() => {
         this.onSuccess("register");
-        this.successMessage = "Produto cadastrado com sucesso!";
+        this.successMessage = "Produto registrado com sucesso!";
         setTimeout(() => { this.successMessage = ''; }, 4000); // Limpa a mensagem após 4 segundos
       }).registerProduct(
         this.itemCodeRegister,
