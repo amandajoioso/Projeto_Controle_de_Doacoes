@@ -6,3 +6,10 @@ function updateProductInDatabase(row, itemCode, itemName, itemBrand, selectedCat
     sheet.getRange(row, 4).setValue(selectedCategory); // Coluna para Categoria
     sheet.getRange(row, 5).setValue(itemWeight);       // Coluna para Peso do item
 }
+
+function updateProductInRecordSheet(row, itemCode, itemQuantity, itemInsertHour) {
+    const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Planilha de Registro");
+    sheet.getRange(row, 1).setValue(itemCode);         // Coluna para Barras do item
+    sheet.getRange(row, 2).setValue(itemQuantity);     // Coluna para Nome do item
+    sheet.getRange(row, 3).setValue(new Date());
+}

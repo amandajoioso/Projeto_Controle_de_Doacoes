@@ -192,26 +192,23 @@
               <!-- Exibe os campos de atualização se o produto for encontrado -->
               <div v-if="productFound">
                 <div class="mb-3">
-                  <label for="update-item-name" class="form-label">Nome do item</label>
-                  <input type="text" class="form-control" id="update-item-name" v-model="itemNameUpdate" required>
+                  <label for="update-item-name" class="form-label">Código do item</label>
+                  <input type="text" class="form-control" id="update-item-name" v-model="itemCodeUpdate" required>
                 </div>
 
                 <div class="mb-3">
-                  <label for="update-item-brand" class="form-label">Marca do item</label>
-                  <input type="text" class="form-control" id="update-item-brand" v-model="itemBrandUpdate" required>
+                  <label for="update-item-brand" class="form-label">Quantidade do item</label>
+                  <input type="text" class="form-control" id="update-item-brand" v-model="itemQuantity" required>
                 </div>
 
                 <div class="mb-3">
-                  <label for="update-item-weight" class="form-label">Peso do item (gramas)</label>
-                  <input type="text" class="form-control" id="update-item-weight" v-model="itemWeightUpdate" inputmode="numeric" pattern="\d*" required>
+                  <label for="update-item-hour" class="form-label">Hora de inserção</label>
+                  <input type="text" class="form-control" id="update-item-brand" v-model="itemInsertHour" required disabled>
                 </div>
 
-                <div class="input-group mb-3">
-                  <label class="input-group-text" for="update-category">Categoria do produto</label>
-                  <select class="form-select" id="update-category" v-model="selectedCategoryUpdate">
-                    <option disabled value="">Escolha...</option>
-                    <option :value="item.title" v-for="item in itemsRegister" :key="item.id">{{ item.title }}</option>
-                  </select>
+                <div class="mb-3">
+                  <label for="update-item-hour" class="form-label">ID da Campanha</label>
+                  <input type="text" class="form-control" id="update-item-brand" v-model="campaignId" required disabled>
                 </div>
 
                 <!-- Botão para atualizar o produto -->
@@ -328,6 +325,10 @@ createApp({
       itemWeightRegister: '',
       itemQuantityRegister: '',
       selectedCategoryRegister: '',
+      itemCodeUpdate: '',
+      itemQuantity: '',
+      itemInsertHour: '',
+      campaignId: '',
       itemsRegister: [
         { id: 1, title: "Alimento" },
         { id: 2, title: "Higiene/Limpeza" }
@@ -417,21 +418,20 @@ createApp({
     async fetchProductData() {
       // this.loading = true;
       this.errorMessage = "";
-
-      google.script.run.withSuccessHandler(this.handleProductData).fetchProductByCode(this.itemCodeSearch);
+      await google.script.run.withSuccessHandler(this.handleProductData).searchLastInsertedItem(this.itemCodeSearch);
     },
 
     handleProductData(data) {
       if (data) {
           this.rowToUpdate = data.row;
-          this.itemCodeUpdate = data.itemCode;
-          this.itemNameUpdate = data.itemName;
-          this.itemBrandUpdate = data.itemBrand;
-          this.itemWeightUpdate = data.itemWeight;
-          this.selectedCategoryUpdate = data.selectedCategory;
+          this.itemCodeUpdate = data.itemCode;          
+          this.itemQuantity = data.itemQuantity;
+          this.itemInsertHour = data.itemInsertHour;
+          this.campaignId = data.campaignId;
           this.productFound = true;
       } else {
           this.errorMessage = "Produto não encontrado.";
+          // this.errorMessage = data;
           setTimeout(() => { this.errorMessage = ''; }, 4000); // Limpa a mensagem após 4 segundos
       }
       this.loading = false;
@@ -439,11 +439,11 @@ createApp({
 
     async updateProduct() {
       if (
+          !this.rowToUpdate ||
           !this.itemCodeUpdate ||
-          !this.itemNameUpdate ||
-          !this.itemBrandUpdate ||
-          !this.itemWeightUpdate ||
-          !this.selectedCategoryUpdate
+          !this.itemQuantity ||
+          !this.itemInsertHour ||
+          !this.campaignId
       ) {
           this.errorMessage = "Por favor, preencha todos os campos antes de atualizar o produto.";
           setTimeout(() => { this.errorMessage = ''; }, 4000); // Limpa a mensagem após 4 segundos
@@ -456,13 +456,11 @@ createApp({
         this.loading = false;
         this.successMessage = "Produto atualizado com sucesso!";
         setTimeout(() => { this.successMessage = ''; }, 4000); // Limpa a mensagem após 4 segundos
-      }).updateProductInDatabase(
+      }).updateProductInRecordSheet(
         this.rowToUpdate,
         this.itemCodeUpdate,
-        this.itemNameUpdate,
-        this.itemBrandUpdate,
-        this.selectedCategoryUpdate,
-        this.itemWeightUpdate
+        this.itemQuantity,
+        this.itemInsertHour
       );
     },
 
