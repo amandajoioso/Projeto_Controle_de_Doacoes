@@ -27,7 +27,8 @@
       max-height: 80px;
       /* Limita a altura da imagem */
       object-fit: cover;
-      /* Garante que a imagem se ajuste sem distorção */
+      /* Garante que a imagem se ajuste sem distorção */      
+      background-color: #B6E094;
     }
 
     .card-body {
@@ -67,8 +68,8 @@
               </div>
             
               <div class="mb-3">
-                <label for="item-weight" class="form-label">Quantidade</label>
-                <input type="number" class="form-control" id="item-weight" placeholder="500" v-model="itemWeightRegister"
+                <label for="item-quantity" class="form-label">Quantidade</label>
+                <input type="number" class="form-control" id="item-quantity" placeholder="500" v-model="itemQuantityRegister"
                 min="1" title="A quantidade do produto deve ser um número inteiro maior que zero" pattern="\d*" required>
               </div>
 
@@ -82,7 +83,7 @@
               <!-- Loader ou botão de cadastro -->
               <div class="loader-container mb-3">
                 <!-- Exibe o botão enquanto o loading é falso -->
-                <button type="button" class="btn btn-success w-100" @click="registerProduct" v-if="!loadingRegister">
+                <button type="button" class="btn btn-success w-100" @click="registerProductInRecordSheet" v-if="!loadingRegister">
                   Registrar produto
                 </button>
 
@@ -284,7 +285,7 @@
     <div class="container" v-show="!loading">
       <div v-for="item in items" class="d-inline-flex p-2">
         <div class="card product-card" style="width: 18rem;">
-          <img src="https://artesania-art.vercel.app/assets/product-12-e8b7a70d.svg" class="card-img-top" alt="...">
+          <img src="https://i.imgur.com/0XsMdzq.png" class="card-img-top" alt="...">
           <div class="card-body">
 
             <h5 class="card-title">{{ item.title }}</h5>
@@ -325,6 +326,7 @@ createApp({
       itemNameRegister: '',
       itemBrandRegister: '',
       itemWeightRegister: '',
+      itemQuantityRegister: '',
       selectedCategoryRegister: '',
       itemsRegister: [
         { id: 1, title: "Alimento" },
@@ -363,16 +365,15 @@ createApp({
       }
     },
 
-    async registerProduct() {
+    async registerProductInRecordSheet() {      
+      this.loadingRegister = true;
       if (
         !this.itemCodeRegister ||
-        !this.itemNameRegister ||
-        !this.itemBrandRegister ||
-        !this.itemWeightRegister ||
-        !this.selectedCategoryRegister
+        !this.itemQuantityRegister
       ) {
         this.errorMessage = "Por favor, preencha todos os campos antes de registrar o produto.";
         setTimeout(() => { this.errorMessage = ''; }, 4000); // Limpa a mensagem após 4 segundos
+        this.loadingRegister = false;
         return;
       }
 
@@ -381,15 +382,17 @@ createApp({
       ) {
         this.errorMessage = "O código de barras deve ter pelo menos oito dígitos.";
         setTimeout(() => { this.errorMessage = ''; }, 4000); // Limpa a mensagem após 4 segundos
+        this.loadingRegister = false;
         return;
       }
 
       this.errorMessage = '';
 
       google.script.run.withSuccessHandler((barcodeExists) => {
-        if (barcodeExists) {
-          this.errorMessage = "O código de barras já existe. Insira um código diferente.";
+        if (!barcodeExists) {
+          this.errorMessage = "O código de barras não existe. Cadastre o código";
           setTimeout(() => { this.errorMessage = ''; }, 4000); // Limpa a mensagem após 4 segundos
+          this.loadingRegister = false;
           return;
         } else {
           this.registerProductInBackend();
@@ -398,25 +401,17 @@ createApp({
     },
 
     async registerProductInBackend() {
-      this.loadingRegister = true;
-
       await google.script.run.withSuccessHandler(() => {
         this.onSuccess("register");
         this.successMessage = "Produto registrado com sucesso!";
         setTimeout(() => { this.successMessage = ''; }, 4000); // Limpa a mensagem após 4 segundos
-      }).registerProduct(
+        this.loadingRegister = false;
+      }).registerProductInRecordSheet(
         this.itemCodeRegister,
-        this.itemNameRegister,
-        this.itemBrandRegister,
-        this.selectedCategoryRegister,
-        this.itemWeightRegister
-      ); 
-      
+        this.itemQuantityRegister
+      );    
       this.itemCodeRegister = '';
-      this.itemNameRegister = '';
-      this.itemBrandRegister = '';
-      this.itemWeightRegister = '';
-      this.selectedCategoryRegister = '';
+      this.itemQuantityRegister = '';
     },
 
     async fetchProductData() {

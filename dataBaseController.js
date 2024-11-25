@@ -17,8 +17,27 @@ function registerProduct(itemCode='123456789', itemName='a', itemBrand='b', sele
   } catch (error) {
     // Retorna o erro para o cliente
     throw new Error(`Erro ao registrar produto: ${error.message}`);
-  }
-
-  
+  }  
 }
 
+function registerProductInRecordSheet(itemCode='123456789', itemQuantity='1') {
+  try {
+    // Validações de dados feita no front end
+
+    // Se todas as validações passarem, prossegue para inserir os dados na planilha
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var productsSheet = ss.getSheetByName("Planilha de Registro");
+
+    var row = productsSheet.getLastRow() + 1;
+
+    // Adiciona os dados do produto à planilha
+    productsSheet.getRange(row, 1).setValue(itemCode);
+    productsSheet.getRange(row, 2).setValue(itemQuantity);
+    productsSheet.getRange(row, 3).setValue(new Date());
+    // productsSheet.getRange(row, 4).setValue(selectedCategory);
+    // productsSheet.getRange(row, 5).setValue(itemWeight);
+  } catch (error) {
+    // Retorna o erro para o cliente
+    throw new Error(`Erro ao registrar produto: ${error.message}`);
+  }  
+}

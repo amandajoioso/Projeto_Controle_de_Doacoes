@@ -28,6 +28,7 @@
       /* Limita a altura da imagem */
       object-fit: cover;
       /* Garante que a imagem se ajuste sem distorção */
+      background-color: #B6E094;
     }
 
     .card-body {
@@ -303,9 +304,8 @@
     <div class="container" v-show="!loading">
       <div v-for="item in items" class="d-inline-flex p-2">
         <div class="card product-card" style="width: 18rem;">
-          <img src="https://artesania-art.vercel.app/assets/product-12-e8b7a70d.svg" class="card-img-top" alt="...">
+          <img src="https://i.imgur.com/0XsMdzq.png" class="card-img-top" alt="...">
           <div class="card-body">
-
             <h5 class="card-title">{{ item.title }}</h5>
             <p class="card-text">{{ item.description }}</p>
 
