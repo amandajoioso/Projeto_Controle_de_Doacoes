@@ -27,7 +27,7 @@
       max-height: 80px;
       /* Limita a altura da imagem */
       object-fit: cover;
-      /* Garante que a imagem se ajuste sem distorção */      
+      /* Garante que a imagem se ajuste sem distorção */
       background-color: #B6E094;
     }
 
@@ -42,7 +42,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
-    }  
+    }
   </style>
 </head>
 
@@ -64,9 +64,9 @@
               <div class="mb-3">
                 <label for="item-code" class="form-label">Código de barras do produto</label>
                 <input type="number" class="form-control" id="item-code" placeholder="7898922460056" v-model="itemCodeRegister"
-                min="10000000" pattern="\d{8,}" title="O código de barras deve conter pelo menos 8 dígitos" pattern="\d*" required> 
+                min="10000000" pattern="\d{8,}" title="O código de barras deve conter pelo menos 8 dígitos" pattern="\d*" required>
               </div>
-            
+
               <div class="mb-3">
                 <label for="item-quantity" class="form-label">Quantidade</label>
                 <input type="number" class="form-control" id="item-quantity" placeholder="500" v-model="itemQuantityRegister"
@@ -79,7 +79,7 @@
               <!-- Mensagem de erro -->
               <div v-if="errorMessage" class="alert alert-danger mt-3">{{ errorMessage }}</div>
 
-            
+
               <!-- Loader ou botão de cadastro -->
               <div class="loader-container mb-3">
                 <!-- Exibe o botão enquanto o loading é falso -->
@@ -128,72 +128,8 @@
               <!-- Exibe os campos de atualização se o produto for encontrado -->
               <div v-if="productFound">
                 <div class="mb-3">
-                  <label for="update-item-name" class="form-label">Nome do item</label>
-                  <input type="text" class="form-control" id="update-item-name" v-model="itemNameUpdate" required disabled>
-                </div>
-
-                <div class="mb-3">
-                  <label for="update-item-brand" class="form-label">Marca do item</label>
-                  <input type="text" class="form-control" id="update-item-brand" v-model="itemBrandUpdate" required disabled>
-                </div>
-
-                <div class="mb-3">
-                  <label for="update-item-weight" class="form-label">Peso do item (gramas)</label>
-                  <input type="text" class="form-control" id="update-item-weight" v-model="itemWeightUpdate" inputmode="numeric" pattern="\d*" required disabled>
-                </div>
-
-                <div class="input-group mb-3">
-                  <label class="input-group-text" for="update-category">Categoria do produto</label>
-                  <select class="form-select" id="update-category" v-model="selectedCategoryUpdate" disabled>
-                    <option disabled value="">Escolha...</option>
-                    <option :value="item.title" v-for="item in itemsRegister" :key="item.id">{{ item.title }}</option>
-                  </select>
-                </div>
-                
-              </div>
-
-              <!-- Mensagem de sucesso -->
-              <div v-if="successMessage" class="alert alert-success mt-3">{{ successMessage }}</div>
-              
-              <!-- Mensagem de erro caso o produto não seja encontrado -->
-              <div v-else-if="errorMessage" class="alert alert-danger mt-3">{{ errorMessage }}</div>
-
-              
-
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
-          </div>
-        </div>
-      </div>
-    </div>
-    <!-- Modal Em construção -->
-
-    <!-- Modal Atualizar Produto -->
-    <div class="modal fade" id="staticBackdrop2" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-        aria-labelledby="updateProductLabel" aria-hidden="true">
-      <div class="modal-dialog modal-xl modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h1 class="modal-title fs-5" id="updateProductLabel">Atualizar Produto</h1>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <div class="container">
-              <!-- Input para buscar o código de barras -->
-              <div class="mb-3">
-                <label for="search-code" class="form-label">Código de barras do produto</label>
-                <input type="text" class="form-control" id="search-code" placeholder="7898922460056"
-                      v-model="itemCodeSearch" inputmode="numeric" pattern="\d*" required>
-                <button class="btn btn-primary mt-2" @click="fetchProductData">Buscar Produto</button>
-              </div>
-
-              <!-- Exibe os campos de atualização se o produto for encontrado -->
-              <div v-if="productFound">
-                <div class="mb-3">
                   <label for="update-item-name" class="form-label">Código do item</label>
-                  <input type="text" class="form-control" id="update-item-name" v-model="itemCodeUpdate" required>
+                  <input type="text" class="form-control" id="update-item-name" v-model="itemCodeUpdate" required disabled>
                 </div>
 
                 <div class="mb-3">
@@ -211,17 +147,88 @@
                   <input type="text" class="form-control" id="update-item-brand" v-model="campaignId" required disabled>
                 </div>
 
-                <!-- Botão para atualizar o produto -->
-                <button class="btn btn-success w-100" @click="updateProduct">Atualizar Produto</button>
               </div>
 
               <!-- Mensagem de sucesso -->
               <div v-if="successMessage" class="alert alert-success mt-3">{{ successMessage }}</div>
-              
+
               <!-- Mensagem de erro caso o produto não seja encontrado -->
               <div v-else-if="errorMessage" class="alert alert-danger mt-3">{{ errorMessage }}</div>
 
-              
+
+
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Modal Em construção -->
+
+    <!-- Modal Atualizar Produto -->
+    <div class="modal fade" id="staticBackdrop2" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+      aria-labelledby="updateProductLabel" aria-hidden="true">
+      <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="updateProductLabel">Atualizar Produto</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="container">
+              <!-- Input para buscar o código de barras -->
+              <div class="mb-3">
+                <label for="search-code" class="form-label">Código de barras do produto</label>
+                <input type="text" class="form-control" id="search-code" placeholder="7898922460056"
+                      v-model="itemCodeSearch" inputmode="numeric" pattern="\d*" required>
+                <button class="btn btn-primary mt-2" @click="fetchProductData" v-if="!loadingUpdateProductData">Buscar Produto</button>
+              </div>
+
+              <!-- Exibe o loader enquanto loading é true -->
+              <div class="d-flex justify-content-center">
+                <div class="spinner-border text-succes" role="status" v-show="loadingUpdateProductData">
+                  <span class="visually-hidden">Loading...</span>
+                </div>
+              </div>
+
+              <!-- Exibe os campos de atualização se o produto for encontrado -->
+              <div v-if="productFound">
+                <div class="mb-3">
+                  <label for="update-item-name" class="form-label">Código do item</label>
+                  <input type="text" class="form-control" id="update-item-name" v-model="itemCodeUpdate" required disabled>
+                </div>
+
+                <div class="mb-3">
+                  <label for="update-item-brand" class="form-label">Quantidade do item</label>
+                  <input type="text" class="form-control" id="update-item-brand" v-model="itemQuantity" required>
+                </div>
+
+                <div class="mb-3">
+                  <label for="update-item-hour" class="form-label">Hora de inserção</label>
+                  <input type="text" class="form-control" id="update-item-brand" v-model="itemInsertHour" required disabled>
+                </div>
+
+                <div class="mb-3">
+                  <label for="update-item-hour" class="form-label">ID da Campanha</label>
+                  <input type="text" class="form-control" id="update-item-brand" v-model="campaignId" required disabled>
+                </div>
+
+                <!-- Mensagem de sucesso -->
+                <div v-if="successMessage" class="alert alert-success mt-3">{{ successMessage }}</div>
+
+                <!-- Mensagem de erro caso o produto não seja encontrado -->
+                <div v-else-if="errorMessage" class="alert alert-danger mt-3">{{ errorMessage }}</div>
+
+                <!-- Botão para atualizar o produto -->
+                <button class="btn btn-success w-100" @click="updateProduct">Atualizar Produto</button>
+              </div>
+
+              <!-- Mensagem de erro caso o produto não seja encontrado -->
+                <div v-else-if="errorMessage" class="alert alert-danger mt-3">{{ errorMessage }}</div>
+
+
 
             </div>
           </div>
@@ -234,7 +241,7 @@
 
     <!-- Modal Excluir Produto -->
     <div class="modal fade" id="staticBackdrop3" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-        aria-labelledby="excludeProductLabel" aria-hidden="true">
+      aria-labelledby="excludeProductLabel" aria-hidden="true">
       <div class="modal-dialog modal-xl modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header">
@@ -261,7 +268,7 @@
 
                 <!-- Mensagem de sucesso -->
                 <div v-if="successMessage" class="alert alert-success mt-3">{{ successMessage }}</div>
-      
+
                 <!-- Mensagem de erro -->
                 <div v-if="errorMessage" class="alert alert-danger mt-3">{{ errorMessage }}</div>
 
@@ -302,7 +309,7 @@
 </body>
 
 <script>
-const { createApp } = Vue;
+  const { createApp } = Vue;
 
 createApp({
   data() {
@@ -318,6 +325,7 @@ createApp({
       
       // Register data
       loadingRegister: false,
+      loadingUpdateProductData: false,
       itemCodeRegister: '',
       productFound: false, // Controla a exibição dos campos de atualização
       itemNameRegister: '',
@@ -416,13 +424,13 @@ createApp({
     },
 
     async fetchProductData() {
-      // this.loading = true;
+      this.loadingUpdateProductData = true;
       this.errorMessage = "";
       await google.script.run.withSuccessHandler(this.handleProductData).searchLastInsertedItem(this.itemCodeSearch);
     },
 
     handleProductData(data) {
-      if (data) {
+      if (data && data !== null) {
           this.rowToUpdate = data.row;
           this.itemCodeUpdate = data.itemCode;          
           this.itemQuantity = data.itemQuantity;
@@ -431,19 +439,15 @@ createApp({
           this.productFound = true;
       } else {
           this.errorMessage = "Produto não encontrado.";
-          // this.errorMessage = data;
           setTimeout(() => { this.errorMessage = ''; }, 4000); // Limpa a mensagem após 4 segundos
+          this.loadingUpdateProductData = false;
       }
-      this.loading = false;
+      this.loadingUpdateProductData = false;
     },
 
     async updateProduct() {
-      if (
-          !this.rowToUpdate ||
-          !this.itemCodeUpdate ||
-          !this.itemQuantity ||
-          !this.itemInsertHour ||
-          !this.campaignId
+      if (         
+          this.itemQuantity<=0     
       ) {
           this.errorMessage = "Por favor, preencha todos os campos antes de atualizar o produto.";
           setTimeout(() => { this.errorMessage = ''; }, 4000); // Limpa a mensagem após 4 segundos
@@ -468,7 +472,7 @@ createApp({
       this.loading = true;
       this.errorMessage = "";
 
-      google.script.run.withSuccessHandler(this.handleDeleteProduct).fetchProductByCode(this.itemCodeSearch);
+      google.script.run.withSuccessHandler(this.handleDeleteProduct).searchLastInsertedItem(this.itemCodeSearch);
     },
 
     handleDeleteProduct(data) {
@@ -477,7 +481,7 @@ createApp({
           this.loading = false;
           this.successMessage = "Produto deletado com sucesso!";
           setTimeout(() => { this.successMessage = ''; }, 4000); // Limpa a mensagem após 4 segundos
-        }).excludeProductInDatabase(
+        }).excludeProductInDatabaseRegistro(
           data.row
         );
 
@@ -486,8 +490,10 @@ createApp({
           this.errorMessage = "Produto não encontrado.";
           setTimeout(() => { this.errorMessage = ''; }, 4000); // Limpa a mensagem após 4 segundos
       }
-    }
-  }
+    },
+
+  } 
+    
 }).mount('#app-menu');
 </script>
 
