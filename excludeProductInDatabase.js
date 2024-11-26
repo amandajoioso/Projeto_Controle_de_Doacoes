@@ -3,3 +3,9 @@ function excludeProductInDatabase(row) {
   console.log(row);
   sheet.deleteRow(row);
 }
+
+function excludeProductInDatabaseRegistro(row) {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Planilha de Registro");
+  console.log(row);
+  sheet.deleteRow(row);
+}
