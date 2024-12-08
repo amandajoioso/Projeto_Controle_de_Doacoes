@@ -1,4 +1,4 @@
-function registerProduct(itemCode='123456789', itemName='a', itemBrand='b', selectedCategory='Alimento', itemWeight='2') {
+function registerProduct(itemCode='123456789', itemName='a', itemBrand='b', selectedCategory='Alimento', itemWeight='2',itemUnit='ml (mililitros)') {
   try {
     // Validações de dados feita no front end
 
@@ -14,13 +14,15 @@ function registerProduct(itemCode='123456789', itemName='a', itemBrand='b', sele
     productsSheet.getRange(row, 3).setValue(itemBrand);
     productsSheet.getRange(row, 4).setValue(selectedCategory);
     productsSheet.getRange(row, 5).setValue(itemWeight);
+    productsSheet.getRange(row, 6).setValue(itemUnit);
+
   } catch (error) {
     // Retorna o erro para o cliente
     throw new Error(`Erro ao registrar produto: ${error.message}`);
   }  
 }
 
-function registerProductInRecordSheet(itemCode='123456789', itemQuantity='1') {
+function registerProductInRecordSheet(itemCode, itemQuantity, campaignId) {
   try {
     // Validações de dados feita no front end
 
@@ -34,8 +36,8 @@ function registerProductInRecordSheet(itemCode='123456789', itemQuantity='1') {
     productsSheet.getRange(row, 1).setValue(itemCode);
     productsSheet.getRange(row, 2).setValue(itemQuantity);
     productsSheet.getRange(row, 3).setValue(new Date());
-    // productsSheet.getRange(row, 4).setValue(selectedCategory);
-    // productsSheet.getRange(row, 5).setValue(itemWeight);
+    productsSheet.getRange(row, 4).setValue(campaignId);
+
   } catch (error) {
     // Retorna o erro para o cliente
     throw new Error(`Erro ao registrar produto: ${error.message}`);
