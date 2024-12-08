@@ -15,21 +15,11 @@ function showMenuRegistro() {
   SpreadsheetApp.getUi().showModalDialog(html, `${SERVICENAME}: Planilha de Registro`)
 }
 
-/**
-  * Exibe o menu de opções
-  */
-function showModalRegister() {
-  let html = HtmlService.createHtmlOutputFromFile('modalRegister')
-    .setWidth(900)
-    .setHeight(600)
-    .setSandboxMode(HtmlService.SandboxMode.IFRAME);
-  SpreadsheetApp.getUi().showModalDialog(html, `${SERVICENAME}: Cadastro`)
+function showMenuCampanha() {
+  let html = HtmlService.createHtmlOutputFromFile('modalMenuMainCampanha')
+    .setWidth(1200/1.4) // Aumenta a largura para o máximo permitido
+    .setHeight(800/1.4) // Aumenta a altura para o máximo permitido
+  SpreadsheetApp.getUi().showModalDialog(html, `${SERVICENAME}: Gestão de Campanhas`)
 }
 
-function showModalAtualizar() {
-  let html = HtmlService.createHtmlOutputFromFile('modalAtualizar')
-    .setWidth(900)
-    .setHeight(600)
-    .setSandboxMode(HtmlService.SandboxMode.IFRAME);
-  SpreadsheetApp.getUi().showModalDialog(html, `${SERVICENAME}: Atualização`)
-}
+
