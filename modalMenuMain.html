@@ -78,9 +78,21 @@
               </div>
 
               <div class="mb-3">
-                <label for="item-weight" class="form-label">Peso do item (gramas)</label>
+                <label for="item-weight" class="form-label">Peso do item</label>
                 <input type="number" class="form-control" id="item-weight" placeholder="500" v-model="itemWeightRegister"
                 min="1" title="O peso do produto deve ser um número inteiro maior que zero" pattern="\d*" required>
+              </div>
+
+
+
+              <!-- Dropdown de unidade -->
+              <div class="input-group mb-3">
+                <label class="input-group-text" for="inputProductUnit">Unidade de medida do produto</label>
+                <select class="form-select" id="inputProductUnit" v-model="selectedUnitRegister">
+                  <option disabled value="">Escolha...</option>
+                  <option :value="item.title" v-for="item in unitRegister" :key="item.id">{{ item.title }}</option>
+
+                </select>
               </div>
 
               <!-- Dropdown de categoria -->
@@ -157,8 +169,17 @@
                 </div>
 
                 <div class="mb-3">
-                  <label for="update-item-weight" class="form-label">Peso do item (gramas)</label>
+                  <label for="update-item-weight" class="form-label">Peso do item</label>
                   <input type="text" class="form-control" id="update-item-weight" v-model="itemWeightUpdate" inputmode="numeric" pattern="\d*" required disabled>
+                </div>
+
+
+                <div class="input-group mb-3">
+                  <label class="input-group-text" for="update-productUnit">Unidade de medida do produto</label>
+                  <select class="form-select" id="update-productUnit" v-model="selectedProductUnitUpdate" disabled>
+                    <option disabled value="">Escolha...</option>
+                    <option :value="item.title" v-for="item in unitRegister" :key="item.id">{{ item.title }}</option>
+                  </select>
                 </div>
 
                 <div class="input-group mb-3">
@@ -221,8 +242,17 @@
                 </div>
 
                 <div class="mb-3">
-                  <label for="update-item-weight" class="form-label">Peso do item (gramas)</label>
+                  <label for="update-item-weight" class="form-label">Peso do item</label>
                   <input type="text" class="form-control" id="update-item-weight" v-model="itemWeightUpdate" inputmode="numeric" pattern="\d*" required>
+                </div>
+
+
+                <div class="input-group mb-3">
+                  <label class="input-group-text" for="update-productUnit">Unidade de medida do produto</label>
+                  <select class="form-select" id="update-productUnit" v-model="selectedProductUnitUpdate">
+                    <option disabled value="">Escolha...</option>
+                    <option :value="item.title" v-for="item in unitRegister" :key="item.id">{{ item.title }}</option>
+                  </select>
                 </div>
 
                 <div class="input-group mb-3">
@@ -349,6 +379,13 @@ createApp({
         { id: 1, title: "Alimento" },
         { id: 2, title: "Higiene/Limpeza" }
       ],
+      selectedUnitRegister: '',
+      unitRegister: [
+        { id: 1, title: "ml (mililitros)" },
+        { id: 2, title: "l (litros)" },
+        { id: 3, title: "g (gramas)" },
+        { id: 4, title: "kg (kilogramas)" }
+      ],
       errorMessage: '', // Variável para armazenar a mensagem de erro
       successMessage: '',  // Variável para a mensagem de sucesso
     };
@@ -388,7 +425,8 @@ createApp({
         !this.itemNameRegister ||
         !this.itemBrandRegister ||
         !this.itemWeightRegister ||
-        !this.selectedCategoryRegister
+        !this.selectedCategoryRegister ||
+        !this.selectedUnitRegister
       ) {
         this.errorMessage = "Por favor, preencha todos os campos antes de cadastrar o produto.";
         setTimeout(() => { this.errorMessage = ''; }, 4000); // Limpa a mensagem após 4 segundos
@@ -428,7 +466,8 @@ createApp({
         this.itemNameRegister,
         this.itemBrandRegister,
         this.selectedCategoryRegister,
-        this.itemWeightRegister
+        this.itemWeightRegister,
+        this.selectedUnitRegister
       ); 
       
       this.itemCodeRegister = '';
@@ -436,6 +475,7 @@ createApp({
       this.itemBrandRegister = '';
       this.itemWeightRegister = '';
       this.selectedCategoryRegister = '';
+      this.selectedUnitRegister = '';
     },
 
     async fetchProductData() {
@@ -453,6 +493,7 @@ createApp({
           this.itemBrandUpdate = data.itemBrand;
           this.itemWeightUpdate = data.itemWeight;
           this.selectedCategoryUpdate = data.selectedCategory;
+          this.selectedProductUnitUpdate = data.selectedProductUnit;
           this.productFound = true;
       } else {
           this.errorMessage = "Produto não encontrado.";
@@ -467,7 +508,8 @@ createApp({
           !this.itemNameUpdate ||
           !this.itemBrandUpdate ||
           !this.itemWeightUpdate ||
-          !this.selectedCategoryUpdate
+          !this.selectedCategoryUpdate ||
+          !this.selectedProductUnitUpdate
       ) {
           this.errorMessage = "Por favor, preencha todos os campos antes de atualizar o produto.";
           setTimeout(() => { this.errorMessage = ''; }, 4000); // Limpa a mensagem após 4 segundos
@@ -486,7 +528,8 @@ createApp({
         this.itemNameUpdate,
         this.itemBrandUpdate,
         this.selectedCategoryUpdate,
-        this.itemWeightUpdate
+        this.itemWeightUpdate,
+        this.selectedProductUnitUpdate
       );
     },
 
