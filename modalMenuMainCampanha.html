@@ -20,10 +20,11 @@
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        align-content: center;
+        align-items: center; /* Alinha os elementos no centro horizontalmente */
         width: 250px;
         height: 280px;
         position: relative;
+        margin: 10px; /* Espaçamento entre os cards */
       }
 
       .card-img-top {
@@ -45,6 +46,14 @@
         display: flex;
         justify-content: center;
         align-items: center;
+      }
+
+      /* Ajuste responsivo para os cards */
+      @media (max-width: 768px) {
+        .campaign-card {
+          width: 200px;
+          height: 250px;
+        }
       }
     </style>
   </head>
@@ -167,6 +176,93 @@
       </div>
       <!-- Modal Registrar Campanha -->
 
+      <!-- Modal Deletar Campanha -->
+      <div
+        class="modal fade"
+        id="staticBackdrop2"
+        data-bs-backdrop="static"
+        data-bs-keyboard="false"
+        tabindex="-1"
+        aria-labelledby="staticBackdropLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h1 class="modal-title fs-5" id="staticBackdropLabel">
+                Deletar Campanha
+              </h1>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div class="modal-body">
+              <div class="container">
+                <!-- Inputs de Campanha -->
+                <div class="mb-3">
+                  <label for="campaign-name" class="form-label"
+                    >Nome da Campanha</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="campaign-name"
+                    placeholder="Ex: Campanha Solidária"
+                    v-model="campaignNameRegister"
+                    required
+                  />
+                </div>
+
+                <!-- Mensagem de sucesso -->
+                <div v-if="successMessage" class="alert alert-success mt-3">
+                  {{ successMessage }}
+                </div>
+
+                <!-- Mensagem de erro -->
+                <div v-if="errorMessage" class="alert alert-danger mt-3">
+                  {{ errorMessage }}
+                </div>
+
+                <!-- Loader ou botão de cadastro -->
+                <div class="loader-container mb-3">
+                  <button
+                    type="button"
+                    class="btn btn-success w-100"
+                    @click="deleteProduct"
+                    v-if="!loadingRegister"
+                  >
+                    Deletar Campanha
+                  </button>
+                  <div class="d-flex justify-content-center">
+                    <div
+                      class="spinner-border text-succes"
+                      role="status"
+                      v-show="loadingRegister"
+                    >
+                      <span class="visually-hidden">Loading...</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-bs-dismiss="modal"
+              >
+                Fechar
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Modal Deletar Campanha -->
+
       <!-- Card -->
       <div class="container" v-show="!loading">
         <div v-for="item in items" class="d-inline-flex p-2">
@@ -196,7 +292,7 @@
     </div>
   </body>
 
-  <script>
+<script>
     const { createApp } = Vue;
 
     createApp({
@@ -210,6 +306,12 @@
               button: "Registrar",
               modalID: "#staticBackdrop1",
             },
+            {
+              title: "Deletar Campanha",
+              description: "Delete uma nova campanha",
+              button: "Deletar",
+              modalID: "#staticBackdrop2",
+            }
           ],
           // Campanha data
           loadingRegister: false,
@@ -224,6 +326,7 @@
         async registerCampaignInRecordSheet() {
           this.loadingRegister = true;
 
+          // Verifica se todos os campos foram preenchidos
           if (
             !this.campaignNameRegister ||
             !this.campaignStartDateRegister ||
@@ -237,28 +340,63 @@
             this.loadingRegister = false;
             return;
           }
-
-          this.errorMessage = "";
-          this.successMessage = "Campanha registrada com sucesso!";
-          setTimeout(() => {
-            this.successMessage = "";
-          }, 4000);
-
-          // Chama o Google Apps Script para registrar a campanha
-          google.script.run
-            .withSuccessHandler(() => {
+        
+          // Verifica se o nome da campanha já existe
+          google.script.run.withSuccessHandler((campaignExists) => {
+            if (campaignExists) {
+              this.errorMessage = "O nome da campanha já existe. Insira um nome diferente.";
+              setTimeout(() => { this.errorMessage = ''; }, 4000); // Limpa a mensagem após 4 segundos
               this.loadingRegister = false;
-              this.campaignNameRegister = "";
-              this.campaignStartDateRegister = "";
-              this.campaignEndDateRegister = "";
-            })
-            .registerCampaignInRecordSheet(
-              this.campaignNameRegister,
-              this.campaignStartDateRegister,
-              this.campaignEndDateRegister
-            );
+            } else {
+              // Caso o nome não exista, realiza o registro da campanha
+              google.script.run
+                .withSuccessHandler(() => {
+                  this.loadingRegister = false;
+                  this.campaignNameRegister = "";
+                  this.campaignStartDateRegister = "";
+                  this.campaignEndDateRegister = "";
+                  this.successMessage = "Campanha registrada com sucesso!";
+                  setTimeout(() => {
+                    this.successMessage = "";
+                  }, 4000);
+                })
+                .registerCampaignInRecordSheet(
+                  this.campaignNameRegister,
+                  this.campaignStartDateRegister,
+                  this.campaignEndDateRegister
+                );
+            }
+          }).checkExistsCampanha(this.campaignNameRegister); 
         },
+
+        async deleteProduct() {
+        this.loading = true;
+        this.errorMessage = "";
+
+        // Verifica se o nome da campanha já existe
+          google.script.run.withSuccessHandler((campaignExists) => {
+            if (!campaignExists) {
+              this.errorMessage = "O nome da campanha não existe. Insira um nome diferente.";
+              setTimeout(() => { this.errorMessage = ''; }, 4000); // Limpa a mensagem após 4 segundos
+              this.loading = false;
+            } else {
+              // Caso o nome exista, deletar o registro da campanha
+              google.script.run
+                .withSuccessHandler(() => {
+                  this.loading = false;
+                  this.campaignNameRegister = "";
+                  this.successMessage = "Campanha deletada com sucesso!";
+                  setTimeout(() => {
+                    this.successMessage = "";
+                  }, 4000);
+                })
+                .excludeProductInDatabaseCampanha(this.campaignNameRegister);
+            }
+          }).checkExistsCampanha(this.campaignNameRegister); 
+        },
+      
       },
     }).mount("#app-menu");
-  </script>
+</script>
+
 </html>
