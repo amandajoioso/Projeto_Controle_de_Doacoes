@@ -11,20 +11,35 @@
     integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
   </script>
   <style>
-    .product-card {
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      align-content: center;
-      width: 250px;
-      height: 280px;
-      position: relative;
-    }
+      .containerCard {
+        display: flex;
+        justify-content: center;
+        align-items: flex-start; /* Ajusta a posição no eixo vertical */
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 10px;
+        padding-left: 10px;
+        padding-right: 10px;
+      }
+
+      .product-card {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: stretch; /* Garante que todos os cards tenham a mesma altura */
+        height: 100%; /* Isso vai fazer todos os cards terem a mesma altura */
+        min-height: 380px;
+        max-width: 18rem;
+        width: auto;
+        position: relative;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
 
     .card-img-top {
       width: 100%;
-      height: auto;
-      max-height: 80px;
+      height: 50%;
       /* Limita a altura da imagem */
       object-fit: cover;
       /* Garante que a imagem se ajuste sem distorção */
@@ -42,7 +57,13 @@
       display: flex;
       justify-content: center;
       align-items: center;
-    }  
+      width: 40%;
+      height: 40px;
+      padding-left: 20px;
+      padding-right: 20px;
+      margin-left: 30%;
+    }
+
   </style>
 </head>
 
@@ -63,24 +84,24 @@
               <!-- Inputs de produto -->
               <div class="mb-3">
                 <label for="item-code" class="form-label">Código de barras do produto</label>
-                <input type="number" class="form-control" id="item-code" placeholder="7898922460056" v-model="itemCodeRegister"
+                <input type="number" class="form-control" id="item-code" placeholder="Digite o código de barras" v-model="itemCodeRegister"
                 min="10000000" pattern="\d{8,}" title="O código de barras deve conter pelo menos 8 dígitos" pattern="\d*" required> 
               </div>
 
               <div class="mb-3">
                 <label for="item-name" class="form-label">Nome do item</label>
-                <input type="text" class="form-control" id="item-name" placeholder="Arroz" v-model="itemNameRegister" required>
+                <input type="text" class="form-control" id="item-name" placeholder="Digite o nome do item" v-model="itemNameRegister" required>
               </div>
 
               <div class="mb-3">
                 <label for="item-brand" class="form-label">Marca do item</label>
-                <input type="text" class="form-control" id="item-brand" placeholder="Camil" v-model="itemBrandRegister" required>
+                <input type="text" class="form-control" id="item-brand" placeholder="Digite a marca" v-model="itemBrandRegister" required>
               </div>
 
               <div class="mb-3">
-                <label for="item-weight" class="form-label">Peso do item</label>
-                <input type="number" class="form-control" id="item-weight" placeholder="500" v-model="itemWeightRegister"
-                min="1" title="O peso do produto deve ser um número inteiro maior que zero" pattern="\d*" required>
+                <label for="item-weight" class="form-label">Peso ou volume do item</label>
+                <input type="number" class="form-control" id="item-weight" placeholder="Digite o peso/volume" v-model="itemWeightRegister"
+                min="1" title="O peso/volume do produto deve ser um número inteiro maior que zero" pattern="\d*" required>
               </div>
 
 
@@ -114,7 +135,7 @@
               <!-- Loader ou botão de cadastro -->
               <div class="loader-container mb-3">
                 <!-- Exibe o botão enquanto o loading é falso -->
-                <button type="button" class="btn btn-success w-100" @click="registerProduct" v-if="!loadingRegister">
+                <button type="button" class="btn btn-primary mt-2 buttonPrimary" @click="registerProduct" v-if="!loadingRegister">
                   Cadastrar produto
                 </button>
 
@@ -148,13 +169,22 @@
           </div>
           <div class="modal-body">
             <div class="container">
-              <!-- Input para buscar o código de barras -->
+             <!-- Input para buscar o código de barras -->
               <div class="mb-3">
                 <label for="search-code" class="form-label">Código de barras do produto</label>
-                <input type="text" class="form-control" id="search-code" placeholder="7898922460056"
+                <input type="text" class="form-control" id="search-code" placeholder="Digite o código de barras"
                       v-model="itemCodeSearch" inputmode="numeric" pattern="\d*" required>
-                <button class="btn btn-primary mt-2" @click="fetchProductData">Buscar Produto</button>
+                
+                <div class="loader-container mb-3">
+                  <button type="button" class="btn btn-primary mt-2 buttonPrimary" @click="fetchProductData" v-if="!loadingSearch">Buscar Produto</button>
+                  <div class="d-flex justify-content-center">
+                    <div class="spinner-border text-succes" role="status" v-show="loadingSearch">
+                      <span class="visually-hidden">Loading...</span>
+                    </div>
+                  </div>
+                </div>
               </div>
+
 
               <!-- Exibe os campos de atualização se o produto for encontrado -->
               <div v-if="productFound">
@@ -221,13 +251,23 @@
           </div>
           <div class="modal-body">
             <div class="container">
-              <!-- Input para buscar o código de barras -->
+                        <!-- Input para buscar o código de barras -->
               <div class="mb-3">
                 <label for="search-code" class="form-label">Código de barras do produto</label>
-                <input type="text" class="form-control" id="search-code" placeholder="7898922460056"
+                <input type="text" class="form-control" id="search-code" placeholder="Digite o código de barras"
                       v-model="itemCodeSearch" inputmode="numeric" pattern="\d*" required>
-                <button class="btn btn-primary mt-2" @click="fetchProductData">Buscar Produto</button>
+
+                <div class="loader-container mb-3">
+                  <button type="button" class="btn btn-primary mt-2 buttonPrimary" @click="fetchProductData" v-if="!loadingUpdate">Buscar Produto</button>
+                  
+                  <div class="d-flex justify-content-center">
+                    <div class="spinner-border text-succes" role="status" v-show="loadingUpdate">
+                      <span class="visually-hidden">Loading...</span>
+                    </div>
+                  </div>
+                </div>
               </div>
+
 
               <!-- Exibe os campos de atualização se o produto for encontrado -->
               <div v-if="productFound">
@@ -264,7 +304,7 @@
                 </div>
 
                 <!-- Botão para atualizar o produto -->
-                <button class="btn btn-success w-100" @click="updateProduct">Atualizar Produto</button>
+                <button class="btn btn-primary mt-2 buttonPrimary" @click="updateProduct">Atualizar Produto</button>
               </div>
 
               <!-- Mensagem de sucesso -->
@@ -298,11 +338,11 @@
               <!-- Input para buscar o código de barras -->
               <div class="mb-3">
                 <label for="search-code" class="form-label">Código de barras do produto</label>
-                <input type="text" class="form-control" id="search-code" placeholder="7898922460056"
+                <input type="text" class="form-control" id="search-code" placeholder="Digite o código de barras"
                       v-model="itemCodeSearch" inputmode="numeric" pattern="\d*" required>
 
                 <!-- Exibe o botão enquanto o loading é falso -->
-                <button class="btn btn-primary mt-2" @click="deleteProduct" v-if="!loading">Excluir Produto</button>
+                <button class="btn btn-primary mt-2 buttonPrimary" @click="deleteProduct" v-if="!loading">Excluir Produto</button>
 
                 <!-- Exibe o loader enquanto loading é true -->
                 <div class="mt-2">
@@ -331,22 +371,24 @@
 
 
     <!-- Card -->
-    <div class="container" v-show="!loading">
-      <div v-for="item in items" class="d-inline-flex p-2">
-        <div class="card product-card" style="width: 18rem;">
-          <img src="https://i.imgur.com/0XsMdzq.png" class="card-img-top" alt="...">
-          <div class="card-body">
-            <h5 class="card-title">{{ item.title }}</h5>
-            <p class="card-text">{{ item.description }}</p>
+    <div class="containerCard" v-show="!loading">
+      <div class="row">
+        <div v-for="item in items" class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+          <div class="card product-card" >
+            <img :src="item.image" class="card-img-top" alt="...">
+            <div class="card-body">
+              <h5 class="card-title">{{ item.title }}</h5>
+              <p class="card-text">{{ item.description }}</p>
 
-            <!-- Button trigger modal -->
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" :data-bs-target="item.modalID">
-              {{ item.button }}
-            </button>
-            <!-- <a href="#" class="btn btn-primary buttonPrimary" @click="item.callback">{{ item.button }}</a> -->
+              <!-- Button trigger modal -->
+              <button type="button" class="btn btn-primary" data-bs-toggle="modal" :data-bs-target="item.modalID">
+                {{ item.button }}
+              </button>
+              <!-- <a href="#" class="btn btn-primary buttonPrimary" @click="item.callback">{{ item.button }}</a> -->
+            </div>
           </div>
         </div>
-      </div>
+    </div>
     </div>
     <!-- Card -->
   </div>
@@ -361,14 +403,16 @@ createApp({
       // Main data
       loading: false,
       items: [
-        { "title": "Cadastrar", "description": "Cadastre um novo produto", "button": "Cadastrar", "callback": this.modalRegister, "modalID": "#staticBackdrop1"},
-        { "title": "Atualizar", "description": "Atualize os dados de um produto já cadastrado", "button": "Atualizar", "callback": this.modalAtualizar, "modalID": "#staticBackdrop2"},
-        { "title": "Consultar", "description": "Consulte todos os dados de um produto", "button": "Consultar", "modalID": "#staticBackdrop0"},
-        { "title": "Excluir", "description": "Exclua os dados de um produto", "button": "Excluir", "modalID": "#staticBackdrop3" }
+        { "title": "Cadastrar", "description": "Cadastre um novo produto", "button": "Cadastrar", "callback": this.modalRegister, "modalID": "#staticBackdrop1", "image": "https://i.imgur.com/YyuYxmw.png"},
+        { "title": "Atualizar", "description": "Atualize os dados de um produto já cadastrado", "button": "Atualizar", "callback": this.modalAtualizar, "modalID": "#staticBackdrop2", "image": "https://i.imgur.com/VTpsrS0.png"},
+        { "title": "Consultar", "description": "Consulte todos os dados de um produto", "button": "Consultar", "modalID": "#staticBackdrop0", "image": "https://i.imgur.com/f4LkZA2.png"},
+        { "title": "Excluir", "description": "Exclua os dados de um produto", "button": "Excluir", "modalID": "#staticBackdrop3", "image": "https://i.imgur.com/c4Qq0O3.png" }
       ],
       
       // Register data
       loadingRegister: false,
+      loadingUpdate: false,
+      loadingSearch: false,
       itemCodeRegister: '',
       productFound: false, // Controla a exibição dos campos de atualização
       itemNameRegister: '',
@@ -478,14 +522,29 @@ createApp({
       this.selectedUnitRegister = '';
     },
 
-    async fetchProductData() {
+   async fetchProductData() {
+      this.loadingSearch = true;
+      this.loadingUpdate = true;
       // this.loading = true;
       this.errorMessage = "";
 
-      google.script.run.withSuccessHandler(this.handleProductData).fetchProductByCode(this.itemCodeSearch);
+      try {
+          // Realiza a chamada para buscar o produto
+          await google.script.run.withSuccessHandler(this.handleProductData).fetchProductByCode(this.itemCodeSearch);
+          // setTimeout(() => {
+            //  this.loadingUpdate = false;  // Desativa o loader após 4 segundos
+          //  }, 4000);
+        } catch (error) {
+          console.error(error);
+          this.errorMessage = "Erro ao buscar produto.";
+          setTimeout(() => { this.errorMessage = ''; }, 4000); // Limpa a mensagem após 4 segundos
+        }
+
     },
 
     handleProductData(data) {
+      this.loadingUpdate = false;
+      this.loadingSearch = false;
       if (data) {
           this.rowToUpdate = data.row;
           this.itemCodeUpdate = data.itemCode;
