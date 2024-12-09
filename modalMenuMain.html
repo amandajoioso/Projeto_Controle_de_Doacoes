@@ -11,31 +11,34 @@
     integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
   </script>
   <style>
-      .containerCard {
-        display: flex;
-        justify-content: center;
-        align-items: flex-start; /* Ajusta a posição no eixo vertical */
-        flex-wrap: wrap;
-        gap: 10px;
-        margin-top: 10px;
-        padding-left: 10px;
-        padding-right: 10px;
-      }
+    .containerCard {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      /* Ajusta a posição no eixo vertical */
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+      padding-left: 10px;
+      padding-right: 10px;
+    }
 
-      .product-card {
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        align-items: stretch; /* Garante que todos os cards tenham a mesma altura */
-        height: 100%; /* Isso vai fazer todos os cards terem a mesma altura */
-        min-height: 380px;
-        max-width: 18rem;
-        width: auto;
-        position: relative;
-        border-radius: 10px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        overflow: hidden;
-      }
+    .product-card {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: stretch;
+      /* Garante que todos os cards tenham a mesma altura */
+      height: 100%;
+      /* Isso vai fazer todos os cards terem a mesma altura */
+      min-height: 380px;
+      max-width: 18rem;
+      width: auto;
+      position: relative;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
 
     .card-img-top {
       width: 100%;
@@ -63,7 +66,6 @@
       padding-right: 20px;
       margin-left: 30%;
     }
-
   </style>
 </head>
 
@@ -84,45 +86,51 @@
               <!-- Inputs de produto -->
               <div class="mb-3">
                 <label for="item-code" class="form-label">Código de barras do produto</label>
-                <input type="number" class="form-control" id="item-code" placeholder="Digite o código de barras" v-model="itemCodeRegister"
-                min="10000000" pattern="\d{8,}" title="O código de barras deve conter pelo menos 8 dígitos" pattern="\d*" required> 
+                <input type="number" class="form-control" id="item-code" placeholder="Digite o código de barras" v-model="itemCodeRegister" @input="handleInput"
+                min="10000000" pattern="\d{8,}" title="O código de barras deve conter pelo menos 8 dígitos" pattern="\d*" required>
               </div>
 
-              <div class="mb-3">
-                <label for="item-name" class="form-label">Nome do item</label>
-                <input type="text" class="form-control" id="item-name" placeholder="Digite o nome do item" v-model="itemNameRegister" required>
-              </div>
+              <div v-if="!isFetchingLoader">
+                <div class="mb-3">
+                  <label for="item-name" class="form-label">Nome do item</label>
+                  <input type="text" class="form-control" id="item-name" :placeholder="itemPlaceholder" v-model="itemNameRegister" required :disabled="isDisabled">
+                </div>
 
-              <div class="mb-3">
-                <label for="item-brand" class="form-label">Marca do item</label>
-                <input type="text" class="form-control" id="item-brand" placeholder="Digite a marca" v-model="itemBrandRegister" required>
-              </div>
+                <div class="mb-3">
+                  <label for="item-brand" class="form-label">Marca do item</label>
+                  <input type="text" class="form-control" id="item-brand" placeholder="Digite a marca" v-model="itemBrandRegister" required :disabled="isDisabled">
+                </div>
 
-              <div class="mb-3">
-                <label for="item-weight" class="form-label">Peso ou volume do item</label>
-                <input type="number" class="form-control" id="item-weight" placeholder="Digite o peso/volume" v-model="itemWeightRegister"
-                min="1" title="O peso/volume do produto deve ser um número inteiro maior que zero" pattern="\d*" required>
-              </div>
+                <div class="mb-3">
+                  <label for="item-weight" class="form-label">Peso ou volume do item</label>
+                  <input type="number" class="form-control" id="item-weight" placeholder="Digite o peso/volume" v-model="itemWeightRegister"
+                min="1" title="O peso/volume do produto deve ser um número inteiro maior que zero" pattern="\d*" required :disabled="isDisabled">
+                </div>
 
-
-
-              <!-- Dropdown de unidade -->
-              <div class="input-group mb-3">
-                <label class="input-group-text" for="inputProductUnit">Unidade de medida do produto</label>
-                <select class="form-select" id="inputProductUnit" v-model="selectedUnitRegister">
+                <!-- Dropdown de unidade -->
+                <div class="input-group mb-3">
+                  <label class="input-group-text" for="inputProductUnit">Unidade de medida do produto</label>
+                  <select class="form-select" id="inputProductUnit" v-model="selectedUnitRegister" :disabled="isDisabled">
                   <option disabled value="">Escolha...</option>
                   <option :value="item.title" v-for="item in unitRegister" :key="item.id">{{ item.title }}</option>
-
                 </select>
-              </div>
+                </div>
 
-              <!-- Dropdown de categoria -->
-              <div class="input-group mb-3">
-                <label class="input-group-text" for="inputGroupSelect01">Categoria do produto</label>
-                <select class="form-select" id="inputGroupSelect01" v-model="selectedCategoryRegister">
+                <!-- Dropdown de categoria -->
+                <div class="input-group mb-3">
+                  <label class="input-group-text" for="inputGroupSelect01">Categoria do produto</label>
+                  <select class="form-select" id="inputGroupSelect01" v-model="selectedCategoryRegister" :disabled="isDisabled">
                   <option disabled value="">Escolha...</option>
                   <option :value="item.title" v-for="item in itemsRegister" :key="item.id">{{ item.title }}</option>
                 </select>
+                </div>
+              </div>
+
+              <div v-else class="d-flex justify-content-center align-items-center flex-column mt-3">
+                <div class="alert alert-success text-center mb-2">Buscando dados na API...</div>
+                <div class="spinner-border text-success" role="status">
+                  <span class="visually-hidden">Loading...</span>
+                </div>
               </div>
 
               <!-- Mensagem de sucesso -->
@@ -131,12 +139,17 @@
               <!-- Mensagem de erro -->
               <div v-if="errorMessage" class="alert alert-danger mt-3">{{ errorMessage }}</div>
 
-            
+
               <!-- Loader ou botão de cadastro -->
               <div class="loader-container mb-3">
                 <!-- Exibe o botão enquanto o loading é falso -->
-                <button type="button" class="btn btn-primary mt-2 buttonPrimary" @click="registerProduct" v-if="!loadingRegister">
+                <button type="button" class="btn btn-primary mt-2 buttonPrimary" @click="registerProduct" v-if="!loadingRegister && !isFetchingLoader">
                   Cadastrar produto
+                </button>
+
+                <button type="button" class="btn btn-warning mt-2 buttonPrimary" @click="toggleDisabled" v-if="!loadingRegister && !isFetchingLoader && fetchingSuccess">
+                  <span v-if="isDisabled">Alterar dados vindos da API</span>
+                  <span v-else>Bloquear os campos</span>
                 </button>
 
                 <!-- Exibe o loader enquanto loading é true -->
@@ -169,12 +182,12 @@
           </div>
           <div class="modal-body">
             <div class="container">
-             <!-- Input para buscar o código de barras -->
+              <!-- Input para buscar o código de barras -->
               <div class="mb-3">
                 <label for="search-code" class="form-label">Código de barras do produto</label>
                 <input type="text" class="form-control" id="search-code" placeholder="Digite o código de barras"
                       v-model="itemCodeSearch" inputmode="numeric" pattern="\d*" required>
-                
+
                 <div class="loader-container mb-3">
                   <button type="button" class="btn btn-primary mt-2 buttonPrimary" @click="fetchProductData" v-if="!loadingSearch">Buscar Produto</button>
                   <div class="d-flex justify-content-center">
@@ -219,16 +232,16 @@
                     <option :value="item.title" v-for="item in itemsRegister" :key="item.id">{{ item.title }}</option>
                   </select>
                 </div>
-                
+
               </div>
 
               <!-- Mensagem de sucesso -->
               <div v-if="successMessage" class="alert alert-success mt-3">{{ successMessage }}</div>
-              
+
               <!-- Mensagem de erro caso o produto não seja encontrado -->
               <div v-else-if="errorMessage" class="alert alert-danger mt-3">{{ errorMessage }}</div>
 
-              
+
 
             </div>
           </div>
@@ -242,7 +255,7 @@
 
     <!-- Modal Atualizar Produto -->
     <div class="modal fade" id="staticBackdrop2" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-        aria-labelledby="updateProductLabel" aria-hidden="true">
+      aria-labelledby="updateProductLabel" aria-hidden="true">
       <div class="modal-dialog modal-xl modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header">
@@ -251,7 +264,7 @@
           </div>
           <div class="modal-body">
             <div class="container">
-                        <!-- Input para buscar o código de barras -->
+              <!-- Input para buscar o código de barras -->
               <div class="mb-3">
                 <label for="search-code" class="form-label">Código de barras do produto</label>
                 <input type="text" class="form-control" id="search-code" placeholder="Digite o código de barras"
@@ -259,7 +272,7 @@
 
                 <div class="loader-container mb-3">
                   <button type="button" class="btn btn-primary mt-2 buttonPrimary" @click="fetchProductData" v-if="!loadingUpdate">Buscar Produto</button>
-                  
+
                   <div class="d-flex justify-content-center">
                     <div class="spinner-border text-succes" role="status" v-show="loadingUpdate">
                       <span class="visually-hidden">Loading...</span>
@@ -309,11 +322,11 @@
 
               <!-- Mensagem de sucesso -->
               <div v-if="successMessage" class="alert alert-success mt-3">{{ successMessage }}</div>
-              
+
               <!-- Mensagem de erro caso o produto não seja encontrado -->
               <div v-else-if="errorMessage" class="alert alert-danger mt-3">{{ errorMessage }}</div>
 
-              
+
 
             </div>
           </div>
@@ -326,7 +339,7 @@
 
     <!-- Modal Excluir Produto -->
     <div class="modal fade" id="staticBackdrop3" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-        aria-labelledby="excludeProductLabel" aria-hidden="true">
+      aria-labelledby="excludeProductLabel" aria-hidden="true">
       <div class="modal-dialog modal-xl modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header">
@@ -353,7 +366,7 @@
 
                 <!-- Mensagem de sucesso -->
                 <div v-if="successMessage" class="alert alert-success mt-3">{{ successMessage }}</div>
-      
+
                 <!-- Mensagem de erro -->
                 <div v-if="errorMessage" class="alert alert-danger mt-3">{{ errorMessage }}</div>
 
@@ -374,7 +387,7 @@
     <div class="containerCard" v-show="!loading">
       <div class="row">
         <div v-for="item in items" class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
-          <div class="card product-card" >
+          <div class="card product-card">
             <img :src="item.image" class="card-img-top" alt="...">
             <div class="card-body">
               <h5 class="card-title">{{ item.title }}</h5>
@@ -388,14 +401,14 @@
             </div>
           </div>
         </div>
-    </div>
+      </div>
     </div>
     <!-- Card -->
   </div>
 </body>
 
 <script>
-const { createApp } = Vue;
+  const { createApp } = Vue;
 
 createApp({
   data() {
@@ -408,7 +421,13 @@ createApp({
         { "title": "Consultar", "description": "Consulte todos os dados de um produto", "button": "Consultar", "modalID": "#staticBackdrop0", "image": "https://i.imgur.com/f4LkZA2.png"},
         { "title": "Excluir", "description": "Exclua os dados de um produto", "button": "Excluir", "modalID": "#staticBackdrop3", "image": "https://i.imgur.com/c4Qq0O3.png" }
       ],
-      
+      // Cadastro de produtos
+      isDisabled: true,
+      isFetching: false,   // Flag para evitar múltiplas execuções
+      isFetchingLoader: false,   // Flag para evitar múltiplas execuções
+      fetchingSuccess: false,   // Flag para evitar múltiplas execuções
+      debounceTimeout: null, // Timeout para debounce
+      itemPlaceholder: 'Digite o nome do item',
       // Register data
       loadingRegister: false,
       loadingUpdate: false,
@@ -435,6 +454,60 @@ createApp({
     };
   },
   methods: {
+    async fetchApiProductSearch() {
+      if (this.isFetching) return; // Impede múltiplas execuções
+      if (String(this.itemCodeRegister).length >= 10) {
+        this.isFetching = true; // Marca a execução como ativa
+        this.isFetchingLoader = true;
+        try {
+          // Adiciona um atraso de 1 segundo (1000ms)
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          // Chama a função da API
+          await google.script.run.withSuccessHandler(this.fetchProductFound).buscarProdutoAPI(this.itemCodeRegister);
+        } catch (error) {
+          console.error(error);
+        } finally {
+          this.isFetching = false; // Libera a execução
+        }
+      }
+    },
+    
+    handleInput() {
+      // Limpa o timeout anterior para reiniciar o atraso
+      clearTimeout(this.debounceTimeout);
+      // Define um novo timeout para chamar a função
+      this.debounceTimeout = setTimeout(() => {
+        this.fetchApiProductSearch();
+      }, 500); // Atraso de 500ms após o último caractere digitado
+    },
+
+    fetchProductFound(data){
+      try {
+        if("Produto não encontrado, digite os dados manualmente!" === data.nomeProduto){
+          this.itemPlaceholder = 'Produto não encontrado, digite os dados manualmente!';
+          this.isFetchingLoader = false;
+          this.fetchingSuccess = true;
+        }
+        else {
+          this.itemNameRegister = data.nomeProduto;
+          this.itemBrandRegister = data.marca;
+          const onlyNumbers = data.peso.replace(/\D/g, '');
+          this.itemWeightRegister = Number(onlyNumbers);
+          this.isFetchingLoader = false;
+          this.fetchingSuccess = true;
+        }
+
+      } catch (error) {
+        console.error(error);
+      } finally {
+        this.isFetchingLoader = false;
+      }
+    },
+
+    toggleDisabled() {
+      this.isDisabled = !this.isDisabled; // Alterna entre true e false
+    },
+
     onSuccess(loadingType) {
       if(loadingType === "register"){
         setTimeout(() => {
@@ -505,6 +578,7 @@ createApp({
         this.onSuccess("register");
         this.successMessage = "Produto cadastrado com sucesso!";
         setTimeout(() => { this.successMessage = ''; }, 4000); // Limpa a mensagem após 4 segundos
+        this.fetchingSuccess = false;
       }).registerProduct(
         this.itemCodeRegister,
         this.itemNameRegister,
