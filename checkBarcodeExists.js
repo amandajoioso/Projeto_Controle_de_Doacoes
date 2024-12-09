@@ -17,8 +17,8 @@ function checkExistsCampanha(campanha) {
 
   // Obtém os dados da coluna A e converte para um Set para busca eficiente
   const data = sheet.getRange("A2:A" + sheet.getLastRow()).getValues();
-  const campanhaSet = new Set(data.map(row => String(row[0]))); // Converte todos os valores para string
+  const campanhaSet = new Set(data.map(row => String(row[0]).toLowerCase())); // Converte todos os valores para string
 
   // Verifica se a campanha existe no Set
-  return campanhaSet.has(String(campanha));  
+  return campanhaSet.has(String(campanha).toLowerCase());  
 }
