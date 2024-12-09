@@ -32,7 +32,7 @@
       height: 100%;
       /* Isso vai fazer todos os cards terem a mesma altura */
       min-height: 380px;
-      max-width: 18rem;
+      max-width: 15rem;
       width: auto;
       position: relative;
       border-radius: 10px;
@@ -86,7 +86,7 @@
               <!-- Inputs de produto -->
               <div class="mb-3">
                 <label for="item-code" class="form-label">Código de barras do produto</label>
-                <input type="number" class="form-control" id="item-code" placeholder="Digite o código de barras" v-model="itemCodeRegister" @input="handleInput"
+                <input type="number" class="form-control" id="item-code" placeholder="O código de barras deve conter pelo menos 8 dígitos" v-model="itemCodeRegister" @input="handleInput"
                 min="10000000" pattern="\d{8,}" title="O código de barras deve conter pelo menos 8 dígitos" pattern="\d*" required>
               </div>
 
@@ -139,7 +139,6 @@
               <!-- Mensagem de erro -->
               <div v-if="errorMessage" class="alert alert-danger mt-3">{{ errorMessage }}</div>
 
-
               <!-- Loader ou botão de cadastro -->
               <div class="loader-container mb-3">
                 <!-- Exibe o botão enquanto o loading é falso -->
@@ -147,10 +146,17 @@
                   Cadastrar produto
                 </button>
 
-                <button type="button" class="btn btn-warning mt-2 buttonPrimary" @click="toggleDisabled" v-if="!loadingRegister && !isFetchingLoader && fetchingSuccess">
+                <!-- <button type="button" class="btn btn-warning mt-2 buttonPrimary" @click="toggleDisabled" v-if="!loadingRegister && !isFetchingLoader && fetchingSuccess">
                   <span v-if="isDisabled">Alterar dados vindos da API</span>
                   <span v-else>Bloquear os campos</span>
                 </button>
+
+
+                <button type="button" class="btn btn-warning mt-2 buttonPrimary" @click="toggleDisabled" v-if="!loadingRegister && !isFetchingLoader && !fetchingSuccess">
+                  <span v-if="isDisabled">Alterar os campos</span>
+                  <span v-else>Bloquear os campos</span>
+                </button> -->
+
 
                 <!-- Exibe o loader enquanto loading é true -->
                 <div class="d-flex justify-content-center">
@@ -185,8 +191,8 @@
               <!-- Input para buscar o código de barras -->
               <div class="mb-3">
                 <label for="search-code" class="form-label">Código de barras do produto</label>
-                <input type="text" class="form-control" id="search-code" placeholder="Digite o código de barras"
-                      v-model="itemCodeSearch" inputmode="numeric" pattern="\d*" required>
+
+                <input type="number" class="form-control" id="search-code" placeholder="O código de barras deve conter pelo menos 8 dígitos" v-model="itemCodeSearch" min="10000000" pattern="\d{8,}" title="O código de barras deve conter pelo menos 8 dígitos" pattern="\d*" required>
 
                 <div class="loader-container mb-3">
                   <button type="button" class="btn btn-primary mt-2 buttonPrimary" @click="fetchProductData" v-if="!loadingSearch">Buscar Produto</button>
@@ -267,8 +273,8 @@
               <!-- Input para buscar o código de barras -->
               <div class="mb-3">
                 <label for="search-code" class="form-label">Código de barras do produto</label>
-                <input type="text" class="form-control" id="search-code" placeholder="Digite o código de barras"
-                      v-model="itemCodeSearch" inputmode="numeric" pattern="\d*" required>
+
+                <input type="number" class="form-control" id="search-code" placeholder="O código de barras deve conter pelo menos 8 dígitos" v-model="itemCodeSearch" min="10000000" pattern="\d{8,}" title="O código de barras deve conter pelo menos 8 dígitos" pattern="\d*" required>
 
                 <div class="loader-container mb-3">
                   <button type="button" class="btn btn-primary mt-2 buttonPrimary" @click="fetchProductData" v-if="!loadingUpdate">Buscar Produto</button>
@@ -316,8 +322,19 @@
                   </select>
                 </div>
 
+
+
+
                 <!-- Botão para atualizar o produto -->
-                <button class="btn btn-primary mt-2 buttonPrimary" @click="updateProduct">Atualizar Produto</button>
+                <div class="loader-container mb-3">
+                  <button type="button" class="btn btn-primary mt-2 buttonPrimary" @click="updateProduct" v-if="!loadingUpdateProduct">Atualizar Produto</button>
+
+                  <div class="d-flex justify-content-center">
+                    <div class="spinner-border text-succes" role="status" v-show="loadingUpdateProduct">
+                      <span class="visually-hidden">Loading...</span>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               <!-- Mensagem de sucesso -->
@@ -351,8 +368,8 @@
               <!-- Input para buscar o código de barras -->
               <div class="mb-3">
                 <label for="search-code" class="form-label">Código de barras do produto</label>
-                <input type="text" class="form-control" id="search-code" placeholder="Digite o código de barras"
-                      v-model="itemCodeSearch" inputmode="numeric" pattern="\d*" required>
+
+                <input type="number" class="form-control" id="search-code" placeholder="O código de barras deve conter pelo menos 8 dígitos" v-model="itemCodeSearch" min="10000000" pattern="\d{8,}" title="O código de barras deve conter pelo menos 8 dígitos" pattern="\d*" required>
 
                 <!-- Exibe o botão enquanto o loading é falso -->
                 <button class="btn btn-primary mt-2 buttonPrimary" @click="deleteProduct" v-if="!loading">Excluir Produto</button>
@@ -422,7 +439,7 @@ createApp({
         { "title": "Excluir", "description": "Exclua os dados de um produto", "button": "Excluir", "modalID": "#staticBackdrop3", "image": "https://i.imgur.com/c4Qq0O3.png" }
       ],
       // Cadastro de produtos
-      isDisabled: true,
+      isDisabled: false,
       isFetching: false,   // Flag para evitar múltiplas execuções
       isFetchingLoader: false,   // Flag para evitar múltiplas execuções
       fetchingSuccess: false,   // Flag para evitar múltiplas execuções
@@ -432,6 +449,7 @@ createApp({
       loadingRegister: false,
       loadingUpdate: false,
       loadingSearch: false,
+      loadingUpdateProduct: false,
       itemCodeRegister: '',
       productFound: false, // Controla a exibição dos campos de atualização
       itemNameRegister: '',
@@ -455,20 +473,40 @@ createApp({
   },
   methods: {
     async fetchApiProductSearch() {
-      if (this.isFetching) return; // Impede múltiplas execuções
-      if (String(this.itemCodeRegister).length >= 10) {
-        this.isFetching = true; // Marca a execução como ativa
-        this.isFetchingLoader = true;
-        try {
-          // Adiciona um atraso de 1 segundo (1000ms)
-          await new Promise(resolve => setTimeout(resolve, 1000));
-          // Chama a função da API
-          await google.script.run.withSuccessHandler(this.fetchProductFound).buscarProdutoAPI(this.itemCodeRegister);
-        } catch (error) {
-          console.error(error);
-        } finally {
-          this.isFetching = false; // Libera a execução
+      if (this.isFetching) return; // Prevent multiple executions
+      if (String(this.itemCodeRegister).length < 10) return; // Ensure barcode has sufficient length
+
+      this.isFetching = true; // Set fetching flag
+      this.isFetchingLoader = true;
+
+      try {
+        // Check if the barcode exists in the base
+        const barcodeExists = await new Promise((resolve) => {
+          google.script.run
+            .withSuccessHandler(resolve)
+            .checkBarcodeExists(this.itemCodeRegister);
+        });
+
+        if (barcodeExists) {
+          // If the barcode exists, show an error message and stop further actions
+          this.errorMessage = "Este código de barras já existe no catálogo de produtos!";
+          setTimeout(() => { this.errorMessage = ''; }, 4000); // Clear the message after 4 seconds
+          this.isFetchingLoader = false;
+          return;
         }
+
+        // If not found in the database, proceed with API search
+        await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate delay
+        google.script.run
+          .withSuccessHandler(this.fetchProductFound)
+          .buscarProdutoAPI(this.itemCodeRegister);
+
+      } catch (error) {
+        console.error("Error during fetchApiProductSearch:", error);
+      } finally {
+        // Reset flags regardless of outcome
+        this.isFetching = false;
+        this.isFetchingLoader = false;
       }
     },
     
@@ -477,6 +515,9 @@ createApp({
       clearTimeout(this.debounceTimeout);
       // Define um novo timeout para chamar a função
       this.debounceTimeout = setTimeout(() => {
+        this.itemNameRegister = '';
+        this.itemBrandRegister = '';
+        this.itemWeightRegister = '';
         this.fetchApiProductSearch();
       }, 500); // Atraso de 500ms após o último caractere digitado
     },
@@ -608,18 +649,17 @@ createApp({
           // setTimeout(() => {
             //  this.loadingUpdate = false;  // Desativa o loader após 4 segundos
           //  }, 4000);
+          //this.loadingUpdate = false;
         } catch (error) {
           console.error(error);
           this.errorMessage = "Erro ao buscar produto.";
           setTimeout(() => { this.errorMessage = ''; }, 4000); // Limpa a mensagem após 4 segundos
         }
-
     },
 
     handleProductData(data) {
-      this.loadingUpdate = false;
       this.loadingSearch = false;
-      if (data) {
+      if (data && data !== null) {
           this.rowToUpdate = data.row;
           this.itemCodeUpdate = data.itemCode;
           this.itemNameUpdate = data.itemName;
@@ -631,11 +671,14 @@ createApp({
       } else {
           this.errorMessage = "Produto não encontrado.";
           setTimeout(() => { this.errorMessage = ''; }, 4000); // Limpa a mensagem após 4 segundos
+          this.loadingUpdate = false;
       }
-      this.loading = false;
+      this.loadingUpdate = false;
+
     },
 
     async updateProduct() {
+      this.loadingUpdateProduct = true;
       if (
           !this.itemCodeUpdate ||
           !this.itemNameUpdate ||
@@ -649,10 +692,11 @@ createApp({
           return;
       }
 
-      this.loading = true;
+      //this.loading = true;
 
       await google.script.run.withSuccessHandler(() => {
         this.loading = false;
+        this.loadingUpdateProduct = false;
         this.successMessage = "Produto atualizado com sucesso!";
         setTimeout(() => { this.successMessage = ''; }, 4000); // Limpa a mensagem após 4 segundos
       }).updateProductInDatabase(
@@ -664,6 +708,7 @@ createApp({
         this.itemWeightUpdate,
         this.selectedProductUnitUpdate
       );
+      setTimeout(() => { this.loadingUpdateProduct = ''; }, 2000); // Limpa a mensagem após 4 segundos
     },
 
     async deleteProduct() {
