@@ -43,13 +43,13 @@
       }
 
       .card-img-top {
-      width: 100%;
-      height: 50%;
-      /* Limita a altura da imagem */
-      object-fit: cover;
-      /* Garante que a imagem se ajuste sem distorção */
-      background-color: #B6E094;
-    }
+        width: 100%;
+        height: 50%;
+        /* Limita a altura da imagem */
+        object-fit: cover;
+        /* Garante que a imagem se ajuste sem distorção */
+        background-color: #b6e094;
+      }
 
       .card-body {
         flex-grow: 1;
@@ -66,7 +66,6 @@
         height: 40px;
         padding-left: 20px;
         padding-right: 20px;
-        
       }
 
       /* Ajuste responsivo para os cards */
@@ -172,7 +171,7 @@
                   </button>
                   <div class="d-flex justify-content-center">
                     <div
-                      class="spinner-border text-succes"
+                      class="spinner-border text-success"
                       role="status"
                       v-show="loadingRegister"
                     >
@@ -259,7 +258,7 @@
                   </button>
                   <div class="d-flex justify-content-center">
                     <div
-                      class="spinner-border text-succes"
+                      class="spinner-border text-success"
                       role="status"
                       v-show="loadingDelete"
                     >
@@ -286,13 +285,12 @@
 
       <!-- Card -->
       <div class="containerCard" v-show="!loading">
-        <div v-for="item in items" class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+        <div
+          v-for="item in items"
+          class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4"
+        >
           <div class="card campaign-card">
-            <img
-              :src="item.image"
-              class="card-img-top"
-              alt="..."
-            />
+            <img :src="item.image" class="card-img-top" alt="..." />
             <div class="card-body">
               <h5 class="card-title">{{ item.title }}</h5>
               <p class="card-text">{{ item.description }}</p>
@@ -313,7 +311,7 @@
     </div>
   </body>
 
-<script>
+  <script>
     const { createApp } = Vue;
 
     createApp({
@@ -330,11 +328,11 @@
             },
             {
               title: "Deletar Campanha",
-              description: "Delete uma nova campanha",
+              description: "Delete uma campanha existente",
               button: "Deletar",
               modalID: "#staticBackdrop2",
               image: "https://i.imgur.com/c4Qq0O3.png",
-            }
+            },
           ],
           // Campanha data
           loadingRegister: false,
@@ -364,65 +362,108 @@
             this.loadingRegister = false;
             return;
           }
-        
+
           // Verifica se o nome da campanha já existe
-          google.script.run.withSuccessHandler((campaignExists) => {
-            if (campaignExists) {
-              this.errorMessage = "O nome da campanha já existe. Insira um nome diferente.";
-              setTimeout(() => { this.errorMessage = ''; }, 4000); // Limpa a mensagem após 4 segundos
+          google.script.run
+            .withFailureHandler((err) => {
               this.loadingRegister = false;
-            } else {
-              // Caso o nome não exista, realiza o registro da campanha
-              google.script.run
-                .withSuccessHandler(() => {
-                  this.loadingRegister = false;
-                  this.campaignNameRegister = "";
-                  this.campaignStartDateRegister = "";
-                  this.campaignEndDateRegister = "";
-                  this.successMessage = "Campanha registrada com sucesso!";
-                  setTimeout(() => {
-                    this.successMessage = "";
-                  }, 4000);
-                })
-                .registerCampaignInRecordSheet(
-                  this.campaignNameRegister,
-                  this.campaignStartDateRegister,
-                  this.campaignEndDateRegister
-                );
-            }
-          }).checkExistsCampanha(this.campaignNameRegister); 
+              this.errorMessage =
+                "Erro do servidor ao verificar campanha: " + err.message;
+              setTimeout(() => {
+                this.errorMessage = "";
+              }, 4000);
+            })
+            .withSuccessHandler((campaignExists) => {
+              if (campaignExists) {
+                this.errorMessage =
+                  "O nome da campanha já existe. Insira um nome diferente.";
+                setTimeout(() => {
+                  this.errorMessage = "";
+                }, 4000);
+                this.loadingRegister = false;
+              } else {
+                // Caso o nome não exista, realiza o registro da campanha
+                google.script.run
+                  .withFailureHandler((err) => {
+                    this.loadingRegister = false;
+                    this.errorMessage =
+                      "Erro do servidor ao registrar campanha: " + err.message;
+                    setTimeout(() => {
+                      this.errorMessage = "";
+                    }, 4000);
+                  })
+                  .withSuccessHandler(() => {
+                    this.loadingRegister = false;
+                    this.campaignNameRegister = "";
+                    this.campaignStartDateRegister = "";
+                    this.campaignEndDateRegister = "";
+                    this.successMessage = "Campanha registrada com sucesso!";
+                    setTimeout(() => {
+                      this.successMessage = "";
+                    }, 4000);
+                  })
+                  .registerCampaignInRecordSheet(
+                    this.campaignNameRegister,
+                    this.campaignStartDateRegister,
+                    this.campaignEndDateRegister
+                  );
+              }
+            })
+            .checkExistsCampanha(this.campaignNameRegister);
         },
 
         async deleteProduct() {
-        this.loading = true;
-        this.loadingDelete = true;
-        this.errorMessage = "";
+          this.loading = true;
+          this.loadingDelete = true;
+          this.errorMessage = "";
 
-        // Verifica se o nome da campanha já existe
-          google.script.run.withSuccessHandler((campaignExists) => {
-            if (!campaignExists) {
-              this.errorMessage = "O nome da campanha não existe. Insira um nome diferente.";
-              setTimeout(() => { this.errorMessage = ''; }, 4000); // Limpa a mensagem após 4 segundos
+          // Verifica se o nome da campanha existe
+          google.script.run
+            .withFailureHandler((err) => {
               this.loading = false;
-            } else {
-              // Caso o nome exista, deletar o registro da campanha
-              google.script.run
-                .withSuccessHandler(() => {
-                  this.loading = false;
-                  this.campaignNameRegister = "";
-                  this.loadingDelete = false;
-                  this.successMessage = "Campanha deletada com sucesso!";
-                  setTimeout(() => {
-                    this.successMessage = "";
-                  }, 4000);
-                })
-                .excludeProductInDatabaseCampanha(this.campaignNameRegister);
-            }
-          }).checkExistsCampanha(this.campaignNameRegister); 
+              this.loadingDelete = false;
+              this.errorMessage =
+                "Erro do servidor ao verificar campanha: " + err.message;
+              setTimeout(() => {
+                this.errorMessage = "";
+              }, 4000);
+            })
+            .withSuccessHandler((campaignExists) => {
+              if (!campaignExists) {
+                this.errorMessage =
+                  "O nome da campanha não existe. Insira um nome diferente.";
+                setTimeout(() => {
+                  this.errorMessage = "";
+                }, 4000);
+                this.loading = false;
+                this.loadingDelete = false;
+              } else {
+                // Caso o nome exista, deletar o registro da campanha
+                google.script.run
+                  .withFailureHandler((err) => {
+                    this.loading = false;
+                    this.loadingDelete = false;
+                    this.errorMessage =
+                      "Erro do servidor ao deletar campanha: " + err.message;
+                    setTimeout(() => {
+                      this.errorMessage = "";
+                    }, 4000);
+                  })
+                  .withSuccessHandler(() => {
+                    this.loading = false;
+                    this.campaignNameRegister = "";
+                    this.loadingDelete = false;
+                    this.successMessage = "Campanha deletada com sucesso!";
+                    setTimeout(() => {
+                      this.successMessage = "";
+                    }, 4000);
+                  })
+                  .excludeProductInDatabaseCampanha(this.campaignNameRegister);
+              }
+            })
+            .checkExistsCampanha(this.campaignNameRegister);
         },
-      
       },
     }).mount("#app-menu");
-</script>
-
+  </script>
 </html>
